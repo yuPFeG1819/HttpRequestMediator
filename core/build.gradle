@@ -9,6 +9,9 @@ plugins {
 def config = rootProject.ext.config
 def libVersion = rootProject.ext.dependencies
 
+//上传的jitpack仓库group
+group = "com.gitee.yupfeg"
+
 android {
     compileSdkVersion config.compileVersion
     buildToolsVersion config.buildToolsVersion
