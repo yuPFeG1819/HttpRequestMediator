@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity">
+
+    <Button
+        android:id="@+id/btn_base_use_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="基础使用"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        />
+
+    <Button
+        android:id="@+id/btn_base_use_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="基础使用2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_base_use_1"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        />
+
+    <Button
+        android:id="@+id/btn_replace_url_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="动态替换url 1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_base_use_2"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        />
+
+    <Button
+        android:id="@+id/btn_replace_url_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="动态替换url 2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_replace_url_1"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
