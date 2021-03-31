@@ -6,6 +6,8 @@
 
 - 可自定义配置的日志输出
 
+- 管理全局公共参数与请求头
+
 - 网络状态监听
 
 - 统一网络请求回调的预处理
@@ -170,6 +172,12 @@ step 3 : 在应用结束时，要取消注册网络状态监听
 fun unRegisterNetworkStatusChange(context : Context)
     
 ```
+
+
+
+### 公共请求参数管理
+
+外部继承`BaseCommParamsInterceptor`，实现`commHeaders`与`commBodyParams`，分别添加固定的公共请求头与公共body参数
 
 
 
