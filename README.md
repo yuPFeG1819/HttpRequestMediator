@@ -3,7 +3,6 @@
 基于`Retofit`与`OkHttp`封装的网络请求库，利用kotlin特性简化网络请求api调用。
 
 - 支持RxJava3
-- 支持kotlin协程
 - 支持管理多种http请求配置
 - 动态替换baseUrl
 - 文件下载
@@ -150,7 +149,7 @@ class HttpRequestConfig{
 }
 ```
 
-> - 默认添加了**日志打印**拦截器、**动态替换baseUrl**的拦截器。
+> - 默认添加了**日志打印**拦截器（网络层）、**动态替换baseUrl**的拦截器（应用层）。
 >
 > - 默认仅支持gson解析，`RxJava3`回调支持（kotlin协程自带支持，不需要额外添加）
 
@@ -192,7 +191,7 @@ fun getUserData(...)
 
 - 需要在部分请求单独忽略url内的某些文段
 
-	则可在网络请求API声明处，添加`@Headers("${REDIRECT_SEGMENT_SIZE_HEAD_PREFIX}${SIZE}"`请求头
+	则可在网络请求API声明处，额外添加`@Headers("${REDIRECT_SEGMENT_SIZE_HEAD_PREFIX}${SIZE}"`请求头
 
     ``` kotlin
     @Headers(
@@ -232,6 +231,14 @@ fun getUserData(...)
 > 以此类推...
 
 
+
+## TODO
+
+- 简化`kotlin`协程的使用，提取通用协程response处理
+
+- 优化下载功能，尝试添加断点续传
+
+  
 
 ## thanks
 
