@@ -1,6 +1,7 @@
 package com.yupfeg.remote.download
 
-import com.yupfeg.logger.ext.logd
+import android.util.Log
+import com.yupfeg.remote.BuildConfig
 import com.yupfeg.remote.download.entity.DownloadProgressBean
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -40,8 +41,11 @@ class DownProgressResponseBody(
                 val bytesRead = super.read(sink, byteCount)
                 downloadBytes += if ((-1).toLong() != bytesRead ) bytesRead else 0
                 val progress = (downloadBytes.toFloat() / responseBody.contentLength()) * 100
-                logd(logTag,"文件下载进度-------->> fileTag : $fileUrl \n " +
-                        "已下载字节：$downloadBytes \n 总计下载字节： ${responseBody.contentLength()},\n 下载进度：$progress")
+                if (BuildConfig.DEBUG){
+                    Log.d(logTag,"文件下载进度-------->> fileTag : $fileUrl \n " +
+                            "已下载字节：$downloadBytes \n " +
+                            "总计下载字节： ${responseBody.contentLength()},\n 下载进度：$progress")
+                }
                 onProgressChangeAction?.invoke(
                     DownloadProgressBean(
                         fileTag = fileUrl,
