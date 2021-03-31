@@ -1,8 +1,7 @@
 package com.yupfeg.remote.config
 
-import com.yupfeg.remote.interceptor.HttpLogInterceptor
+import com.google.gson.GsonBuilder
 import com.yupfeg.remote.interceptor.MultipleHostInterceptor
-import com.yupfeg.logger.json.JsonUtils
 import okhttp3.Cache
 import okhttp3.Interceptor
 import retrofit2.CallAdapter
@@ -58,15 +57,10 @@ class HttpRequestConfig{
             add(MultipleHostInterceptor())
         }
 
-        networkInterceptors.apply {
-            //默认添加打印日志拦截器
-            add(HttpLogInterceptor())
-        }
-
         //json解析器（按添加顺序尝试解析）
         converterFactories.apply {
             //gson解析
-            add(GsonConverterFactory.create(JsonUtils.gson))
+            add(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             //fastjson解析
             //add(FastJsonConverterFactory.create())
         }

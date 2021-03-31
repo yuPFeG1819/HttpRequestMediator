@@ -1,6 +1,6 @@
-package com.yupfeg.remote.rxjava
+package com.yupfeg.remote.tools.rxjava
 
-import com.yupfeg.remote.pool.GlobalHttpThreadPool
+import com.yupfeg.remote.tools.pool.GlobalHttpThreadPool
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.functions.Function
@@ -16,13 +16,13 @@ import org.reactivestreams.Publisher
  * @author yuPFeG
  * @date 2020/02/21
  *
- * @param onNextErrorInterceptor 在onNext前执行错误码拦截检测
+ * @param onNextErrorIntercept 在onNext前执行错误码拦截检测
  * @param doOnErrorConsumer 在onError前统一处理错误
  */
 @Suppress("unused")
 class GlobalHttpTransformer<T>(
     /**在onNext前执行错误码拦截检测*/
-    private val onNextErrorInterceptor: Function<T, Observable<T>>,
+    private val onNextErrorIntercept: Function<T, Observable<T>>,
     /**在onError前统一处理错误*/
     private val doOnErrorConsumer: Consumer<Throwable>
 ) : MaybeTransformer<T, T>, ObservableTransformer<T, T>, FlowableTransformer<T, T> {
@@ -32,7 +32,7 @@ class GlobalHttpTransformer<T>(
 
     override fun apply(upstream: Maybe<T>): MaybeSource<T> {
         return upstream
-            //step1: 订阅（事件源/http请求）发生在子线程(也可交由OkHttp内部管理线程池异步执行)
+            //step1: 订阅（事件源/http请求）发生在子线程
             .subscribeOn(Schedulers.from(GlobalHttpThreadPool.executorService))
             //step2: 事件流下游发生在子线程
             .observeOn(Schedulers.from(GlobalHttpThreadPool.executorService))
@@ -40,12 +40,8 @@ class GlobalHttpTransformer<T>(
             .flatMap { t ->
                 //类似：处理接口返回错误码，抛出对应异常
                 //其他情况，数据向下游正常传递
-                onNextErrorInterceptor.apply(t).firstElement()
+                onNextErrorIntercept.apply(t).firstElement()
             }
-            //重试相关请求
-            //                .retryWhen()
-            //拦截Throwable处理,能发送新的数据源，从而不中断事件流
-            //                .onErrorResumeNext()
             //step4: 事件流下游发生在主线程
             .observeOn(AndroidSchedulers.mainThread())
             //step5: 处理在onError发生之前
@@ -65,12 +61,8 @@ class GlobalHttpTransformer<T>(
             .flatMap { t ->
                 //类似：处理接口返回错误码，抛出对应异常
                 //其他情况，数据向下游正常传递
-                onNextErrorInterceptor.apply(t)
+                onNextErrorIntercept.apply(t)
             }
-            //重试相关请求
-            //                .retryWhen()
-            //拦截Throwable处理,发送新的数据源
-            //                .onErrorResumeNext()
             //step4: 事件流下游发生在主线程
             .observeOn(AndroidSchedulers.mainThread())
             //step5: 处理在onError发生之前
@@ -91,13 +83,9 @@ class GlobalHttpTransformer<T>(
             .flatMap { t ->
                 //类似：处理接口返回错误码，抛出对应异常
                 //其他情况，数据向下游正常传递
-                onNextErrorInterceptor.apply(t)
+                onNextErrorIntercept.apply(t)
                     .toFlowable(BackpressureStrategy.BUFFER)
             }
-            //重试相关请求
-            //                .retryWhen()
-            //拦截Throwable处理,发送新的数据源
-            //                .onErrorResumeNext()
             //step4: 事件流下游发生在主线程
             .observeOn(AndroidSchedulers.mainThread())
             //step5: 处理在onError发生之前

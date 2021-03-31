@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import com.yupfeg.remote.NetWorkStatusHelper
 import com.yupfeg.remote.R
 
 class MainActivity : AppCompatActivity() {
@@ -14,6 +15,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        NetWorkStatusHelper.registerNetWorkStatusChange(this)
 
         findViewById<View>(R.id.btn_base_use_1).setOnClickListener {
             mViewModel.queryAdverts()
@@ -30,5 +33,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn_replace_url_2).setOnClickListener {
             mViewModel.queryRedirectUrlUserData()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        NetWorkStatusHelper.unRegisterNetworkStatusChange(this)
     }
 }

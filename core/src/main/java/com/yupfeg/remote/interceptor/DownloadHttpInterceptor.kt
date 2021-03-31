@@ -1,8 +1,8 @@
 package com.yupfeg.remote.interceptor
 
 import com.yupfeg.remote.download.DownProgressResponseBody
-import com.yupfeg.logger.ext.logd
 import com.yupfeg.remote.download.entity.DownloadProgressBean
+import com.yupfeg.remote.log.HttpLogPrinter
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.lang.StringBuilder
@@ -14,6 +14,7 @@ import java.lang.StringBuilder
  * @date 2020/04/23
  */
 class DownloadHttpInterceptor(
+    private val logPrinter : HttpLogPrinter?,
     private val onProgressChange : ((DownloadProgressBean)->Unit)?
 ) : Interceptor{
     companion object{
@@ -32,7 +33,7 @@ class DownloadHttpInterceptor(
             append("<<< Download Response End \n")
         }
 
-        logd(DEBUG_HTTP_LOG_TAG, builder.toString())
+        logPrinter?.printDebugLog(DEBUG_HTTP_LOG_TAG, builder.toString())
         response.body ?: return response
         return response.newBuilder()
             .body(

@@ -2,6 +2,7 @@ package com.yupfeg.remote.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.yupfeg.remote.NetWorkStatusHelper
 import com.yupfeg.remote.data.remote.TestApi
 import com.yupfeg.remote.tools.httpApiDelegate
 import com.yupfeg.remote.url.UrlRedirectHelper
@@ -23,6 +24,12 @@ class MainViewModel : ViewModel(){
         //添加需要动态替换的baseUrl
         UrlRedirectHelper.putRedirectUrl("user","https://api.juejin.cn/user_api/")
         UrlRedirectHelper.putRedirectUrl("baidu","https://www.baidu.com/")
+
+        val disposable = NetWorkStatusHelper.observeNetWorkStatus()
+            .subscribe {
+                Log.d("okhttp","网络状态变化：${it.name}")
+            }
+        mDisposables.add(disposable)
     }
 
     override fun onCleared() {

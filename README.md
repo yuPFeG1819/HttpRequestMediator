@@ -2,14 +2,36 @@
 
 基于`Retofit`与`OkHttp`封装的网络请求库，利用kotlin特性简化网络请求api调用。
 
-- 支持RxJava3
-- 支持管理多种http请求配置
-- 动态替换baseUrl
-- 文件下载
+- 支持RxJava3，简化RxJava对于网络请求的统一处理
 
-## 项目导入
+- 可自定义配置的日志输出
 
+- 网络状态监听
 
+- 统一网络请求回调的预处理
+
+- 管理多种`Okhttp`与`Retrofit`配置，根据需要使用特定配置
+
+- 支持动态切换BaseUrl
+
+  
+
+## 依赖方式
+
+[![](https://jitpack.io/v/com.gitee.yupfeg/http_request_mediator.svg)](https://jitpack.io/#com.gitee.yupfeg/http_request_mediator)
+
+``` groovy
+//root project build.gradle
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+//module build.gradle
+dependencies {
+    implementation 'com.gitee.yupfeg:http_request_mediator:{$lastVersion}'
+}
+```
 
 
 
@@ -64,6 +86,8 @@ interface TestApi{
 
 ### java
 
+> `java`使用则还是按照原有逻辑处理即可
+
 ``` java
 class DataSource {
     
@@ -99,10 +123,87 @@ class DataSource {
 
 ## 进阶使用
 
-- 管理多种`Okhttp`与`Retrofit`配置，根据需要使用特定配置
-- 支持动态切换BaseUrl
 
-### 多http配置管理
+
+
+
+### 日志输出
+
+内部实现`HttpLogInterceptor`，用于打印输出网络请求`request`与`response`的日志
+
+> 推荐在设置网络配置时，设置给`networkInterceptors`，添加至**网络层拦截器的末尾**，避免遗漏重要日志。
+
+在创建`HttpLogInterceptor`时，可设置`HttpLogPrinter`，以自定义网络请求日志的输出策略。
+
+> 推荐外部调用时设置为统一的日志输出管理类，方便管理日志输出。
+
+
+
+### 网络状态监听
+
+内置了对网络状态变化的监听`NetWorkStatusHelper`
+
+> 兼容android 6.0以下
+
+step 1 : 注册网络状态监听（推荐只在全局注册一个，如`Application`）
+
+
+``` kotlin
+
+@JvmStatic
+fun registerNetWorkChange(context: Context)
+
+```
+
+step 2 : 在需要的地方订阅网络状态变化（这里使用RxJava，后续替换为kotlin flow或者LiveData）
+
+``` kotlin
+@JvmStatic
+fun observeNetWorkStatus() : Observable<NetWorkStatus>
+```
+
+step 3 : 在应用结束时，要取消注册网络状态监听
+
+``` kotlin
+
+@JvmStatic
+fun unRegisterNetworkStatusChange(context : Context)
+    
+```
+
+
+
+### 预处理请求回调
+
+> 目前仅支持RxJava3封装，对于kotlin协程需要外部手动封装
+
+通过RxJava的`compose`操作符，创建`GlobalHttpTransformer`对象。
+
+实现`onNextErrorIntercept`与`doOnErrorConsumer`两个kotlin高阶函数，分别处理请求回调与出现错误时的逻辑。
+
+> 也可在外部进一步封装为`top-level`函数，根据项目的网络请求实际情况处理对应逻辑。
+
+example：
+
+``` kotlin
+fun <T> preProcessHttpResponse() : GlobalHttpTransformer<T> 
+	= GlobalHttpTransformer(
+        onNextErrorIntercept = {
+            //预处理onSuccess()、onNext()逻辑
+            ...
+        },
+        doOnErrorConsumer = {
+            //预处理onError()逻辑
+            ...
+        }
+    )
+```
+
+
+
+
+
+### 多种http配置管理
 
 `HttpRequestMediator`内部基于`HashMap`管理所有网络。而具体`Retrofit`与`OkHttpClient`对象创建，已抽取为独立的工厂类。
 
@@ -232,13 +333,72 @@ fun getUserData(...)
 
 
 
+## 代码混淆配置
+
+内部依赖了`gson`、`okHttp`、`retrofit`
+
+添加官方给出的混淆配置即可
+
+```
+#----------- gson ----------------
+-keep class com.google.gson.** {*;}
+-keep class com.google.**{*;}
+-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.stream.** { *; }
+-keep class com.google.gson.examples.android.model.** { *; }
+#--------------------okhttp3----------------------
+-dontwarn com.squareup.okhttp3.**
+-keep class com.squareup.okhttp3.** { *;}
+-dontwarn com.squareup.**
+-dontwarn okio.**
+-keep public class org.codehaus.* { *; }
+-keep public class java.nio.* { *; }
+#--------------------retrofit2---------------------
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+# Platform calls Class.forName on types which do not exist on Android to determine platform.
+-dontnote retrofit2.Platform
+## Platform used when running on Java 8 VMs. Will not be used at runtime.
+-dontwarn retrofit2.Platform$Java8
+## Retain generic type information for use by reflection by converters and adapters.
+-keepattributes Signature
+## Retain declared checked exceptions for use by a Proxy instance.
+-keepattributes Exceptions
+# Retrofit does reflection on method and parameter annotations.
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+# Retain service method parameters when optimizing.
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+ @retrofit2.http.* <methods>;
+}
+# Ignore annotation used for build tooling.
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+# Ignore JSR 305 annotations for embedding nullability information.
+-dontwarn javax.annotation.**
+
+#解决使用Retrofit+RxJava联网时，在6.0系统出现java.lang.InternalError奔溃的问题:
+#http://blog.csdn.net/mp624183768/article/details/79242147
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+    long producerIndex;
+    long consumerIndex;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode consumerNode;
+}
+```
+
+
+
 ## TODO
 
-- 简化`kotlin`协程的使用，提取通用协程response处理
+- 简化`kotlin`协程的使用，提取通用协程response预处理操作
+- 逐步替换RxJava为kotlin协程 + `kotlin flow`
+- 优化下载功能，添加断点续传功能
 
-- 优化下载功能，尝试添加断点续传
 
-  
 
 ## thanks
 

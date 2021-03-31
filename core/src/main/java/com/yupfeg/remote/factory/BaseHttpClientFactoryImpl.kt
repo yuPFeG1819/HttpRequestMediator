@@ -1,14 +1,12 @@
 package com.yupfeg.remote.factory
 
 import com.yupfeg.remote.config.HttpRequestConfig
-import com.yupfeg.logger.json.JsonUtils
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.CallAdapter
 import retrofit2.Converter
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.NullPointerException
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
@@ -131,13 +129,8 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
         val builder = Retrofit.Builder()
         builder.baseUrl(mBaseUrl)
         //------添加解析器(按添加顺序尝试解析)---------
-        mConverterFactories.takeIf { it.isNullOrEmpty() }?.forEach { converter->
+        mConverterFactories.takeUnless { it.isNullOrEmpty() }?.forEach { converter->
             builder.addConverterFactory(converter)
-        }?:run {
-            //默认添加gson解析
-            builder.addConverterFactory(
-                GsonConverterFactory.create(JsonUtils.gson)
-            )
         }
         //------添加响应回调支持----------
         mCallAdapterFactories.takeIf { it.size > 0 }?.forEach { callAdapter->

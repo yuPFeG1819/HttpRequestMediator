@@ -1,8 +1,7 @@
 package com.yupfeg.remote.interceptor
 
-import com.yupfeg.logger.ext.logd
-import com.yupfeg.logger.ext.logw
 import com.yupfeg.remote.BuildConfig
+import com.yupfeg.remote.log.HttpLogPrinter
 import okhttp3.*
 import okio.Buffer
 import java.io.IOException
@@ -18,7 +17,7 @@ import java.util.concurrent.TimeUnit
  * @author yuPFeG
  * @date 2020/02/21
  */
-class HttpLogInterceptor : Interceptor{
+class HttpLogInterceptor(private val logPrinter: HttpLogPrinter) : Interceptor{
     companion object{
         private val UTF8 = Charset.forName("UTF-8")
         private const val DEBUG_HTTP_LOG_TAG = "okHttp"
@@ -72,7 +71,7 @@ class HttpLogInterceptor : Interceptor{
             //POST请求的body
             appendRequestBodyContent(newRequest.body)
             append("\n>>> END ${newRequest.method} Request")
-            logd(DEBUG_HTTP_LOG_TAG, this.toString())
+            logPrinter.printDebugLog(DEBUG_HTTP_LOG_TAG, this.toString())
         }
     }
 
@@ -96,7 +95,7 @@ class HttpLogInterceptor : Interceptor{
             //请求响应body
             appendResponseBodyContent(response.body)
             append("\n <<<END HTTP")
-            logd(DEBUG_HTTP_LOG_TAG, this.toString())
+            logPrinter.printDebugLog(DEBUG_HTTP_LOG_TAG, this.toString())
         }
     }
 
@@ -117,6 +116,7 @@ class HttpLogInterceptor : Interceptor{
      * */
     private fun StringBuilder.appendRequestBodyContent(body : RequestBody?){
         body?:return
+
         append("\n")
         body.contentType()?.also {contentType->
             append("Content-Type : $contentType \n")
@@ -176,8 +176,7 @@ class HttpLogInterceptor : Interceptor{
         return try {
             URLDecoder.decode(bodyBuffer.readString(UTF8), "UTF-8")
         }catch (e: UnsupportedEncodingException){
-            logw(DEBUG_HTTP_LOG_TAG, "url decode is fail identity body content ")
-            logw(DEBUG_HTTP_LOG_TAG,e)
+            logPrinter.printErrorLog(DEBUG_HTTP_LOG_TAG,e)
             bodyBuffer.readString(UTF8)
         }
     }

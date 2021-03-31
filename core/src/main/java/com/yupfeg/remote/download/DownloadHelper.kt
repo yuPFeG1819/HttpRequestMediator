@@ -1,13 +1,12 @@
 package com.yupfeg.remote.download
 
 import com.jakewharton.rxrelay3.PublishRelay
-import com.yupfeg.logger.ext.logd
-import com.yupfeg.logger.ext.logw
 import com.yupfeg.remote.HttpRequestMediator
 import com.yupfeg.remote.config.HttpRequestConfig
 import com.yupfeg.remote.download.entity.DownloadProgressBean
 import com.yupfeg.remote.interceptor.DownloadHttpInterceptor
-import com.yupfeg.remote.pool.GlobalHttpThreadPool
+import com.yupfeg.remote.log.HttpLogPrinter
+import com.yupfeg.remote.tools.pool.GlobalHttpThreadPool
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
@@ -34,23 +33,11 @@ class DownloadHelper(
     private val requestConfig : HttpRequestConfig
 ) {
 
-    init {
-        HttpRequestMediator.addDefaultHttpClientFactory (requestTag){
-            this.baseUrl = requestConfig.baseUrl
-            connectTimeout = requestConfig.connectTimeout
-            readTimeout = requestConfig.readTimeout
-            writeTimeout = requestConfig.writeTimeout
-            isAllowProxy = requestConfig.isAllowProxy
-            applicationInterceptors = requestConfig.applicationInterceptors
-            networkInterceptors = let{
-                val interceptors = mutableListOf<Interceptor>()
-                requestConfig.networkInterceptors.also {
-                    interceptors.addAll(it)
-                }
-                //默认添加下载进度监听的拦截器
-                interceptors.add(DownloadHttpInterceptor(onDownloadProgressListener))
-                return@let interceptors
-            }
+    companion object{
+        private var logPrinter : HttpLogPrinter? = null
+
+        fun setLogPrinter(printer: HttpLogPrinter){
+            logPrinter = printer
         }
     }
 
@@ -59,12 +46,32 @@ class DownloadHelper(
             requestTag, DownloadApiService::class.java
         )
     }
-
     /**
      * 文件下载进度百分比的可观察对象，
      * [PublishRelay]只有onNext的subject，不会因为OnError中断信息
      * */
     private val downloadProgressSubject = PublishRelay.create<DownloadProgressBean>()
+
+    /**下载进度变化监听*/
+    private val onDownloadProgressListener : ((DownloadProgressBean)->Unit)= {progress->
+        downloadProgressSubject.accept(progress)
+    }
+
+    init {
+        HttpRequestMediator.addDefaultHttpClientFactory (requestTag){
+            this.baseUrl = requestConfig.baseUrl
+            connectTimeout = requestConfig.connectTimeout
+            readTimeout = requestConfig.readTimeout
+            writeTimeout = requestConfig.writeTimeout
+            isAllowProxy = requestConfig.isAllowProxy
+            applicationInterceptors = requestConfig.applicationInterceptors
+            networkInterceptors = mutableListOf<Interceptor>().apply{
+                addAll(requestConfig.networkInterceptors)
+                //默认添加下载进度监听的拦截器
+                add(DownloadHttpInterceptor(logPrinter,onDownloadProgressListener))
+            }
+        }
+    }
 
     /**订阅下载进度变化的可观察对象*/
     fun observeDownloadProgressChange() : Flowable<DownloadProgressBean> {
@@ -87,12 +94,6 @@ class DownloadHelper(
             //上游执行在子线程，下游执行在主线程
             .subscribeOn(Schedulers.from(GlobalHttpThreadPool.executorService))
             .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    /**下载进度变化监听*/
-    private val onDownloadProgressListener : ((DownloadProgressBean)->Unit)= {progress->
-        logd("文件下载进度变化：$progress")
-        downloadProgressSubject.accept(progress)
     }
 
 
@@ -125,7 +126,6 @@ class DownloadHelper(
                 fos.write(buffer, 0, len)
             }while (true)
         }catch (e : IOException){
-            logw(e)
             downloadProgressSubject.accept(createOnDownloadFailBean(fileUrl))
         }finally {
             fos?.flush()

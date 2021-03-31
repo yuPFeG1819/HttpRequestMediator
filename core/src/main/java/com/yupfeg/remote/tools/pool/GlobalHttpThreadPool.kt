@@ -1,6 +1,5 @@
-package com.yupfeg.remote.pool
+package com.yupfeg.remote.tools.pool
 
-import com.yupfeg.logger.ext.logd
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
@@ -33,9 +32,6 @@ internal object GlobalHttpThreadPool {
                 KEEP_ALIVE_SECONDS.toLong(), TimeUnit.SECONDS,
                 LinkedBlockingQueue(), GlobalThreadFactory()
         )
-    }
-    init {
-        logd("global thread pool init")
     }
 }
 
