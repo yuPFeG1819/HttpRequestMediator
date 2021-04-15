@@ -1,8 +1,7 @@
 package com.yupfeg.remote.download
 
-import android.util.Log
-import com.yupfeg.remote.BuildConfig
 import com.yupfeg.remote.download.entity.DownloadProgressBean
+import com.yupfeg.remote.log.HttpLogPrinter
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import okio.*
@@ -17,11 +16,14 @@ class DownProgressResponseBody(
     private val fileUrl : String,
     /**原始的接口返回body*/
     private val responseBody: ResponseBody,
+    private val logPrinter: HttpLogPrinter ?= null,
     /**下载进度百分比变化*/
     private val onProgressChangeAction : ((DownloadProgressBean)->Unit)?= null
 ) : ResponseBody(){
 
     private val logTag = DownProgressResponseBody::class.java.simpleName
+
+
 
     /**
      * BufferedSource 是okio库中的输入流，这里就当作inputStream来使用。
@@ -41,11 +43,11 @@ class DownProgressResponseBody(
                 val bytesRead = super.read(sink, byteCount)
                 downloadBytes += if ((-1).toLong() != bytesRead ) bytesRead else 0
                 val progress = (downloadBytes.toFloat() / responseBody.contentLength()) * 100
-                if (BuildConfig.DEBUG){
-                    Log.d(logTag,"文件下载进度-------->> fileTag : $fileUrl \n " +
-                            "已下载字节：$downloadBytes \n " +
-                            "总计下载字节： ${responseBody.contentLength()},\n 下载进度：$progress")
-                }
+                logPrinter?.printDebugLog(
+                    logTag,"文件下载进度-------->> fileTag : $fileUrl \n " +
+                        "已下载字节：$downloadBytes \n " +
+                        "总计下载字节： ${responseBody.contentLength()},\n 下载进度：$progress"
+                )
                 onProgressChangeAction?.invoke(
                     DownloadProgressBean(
                         fileTag = fileUrl,

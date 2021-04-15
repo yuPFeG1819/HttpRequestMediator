@@ -1,6 +1,5 @@
 package com.yupfeg.remote.interceptor
 
-import com.yupfeg.remote.BuildConfig
 import com.yupfeg.remote.log.HttpLogPrinter
 import okhttp3.*
 import okio.Buffer
@@ -32,20 +31,16 @@ class HttpLogInterceptor(private val logPrinter: HttpLogPrinter) : Interceptor{
         request.body?.contentType()?.charset(UTF8)
         //创建新网络请求(url等参数不需要重复添加)
         val newRequest = builder.build()
-        if (BuildConfig.DEBUG) {
-            //打印请求log
-            printRequestDebugLog(newRequest, chain.connection())
-        }
+        //打印请求log
+        printRequestDebugLog(newRequest, chain.connection())
         //------------------请求响应返回------------------
         //执行网络请求，获取响应返回
         val response = chain.proceed(newRequest)
         val chainMs: Long = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
         response.body?.contentType()?.charset(UTF8)
 
-        if (BuildConfig.DEBUG) {
-            //打印响应log
-            printResponseDebugLog(response,chainMs)
-        }
+        //打印响应log
+        printResponseDebugLog(response,chainMs)
         return response
     }
 

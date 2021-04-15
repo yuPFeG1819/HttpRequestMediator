@@ -40,6 +40,7 @@ class DownloadHttpInterceptor(
                 DownProgressResponseBody(
                     fileUrl = response.request.url.toString(),
                     responseBody = response.body!!,
+                    logPrinter = logPrinter,
                     onProgressChangeAction = onProgressChange
                 )
             ).build()
