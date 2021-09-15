@@ -1,11 +1,11 @@
-package com.yupfeg.remote.ui
+package com.yupfeg.test.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import com.yupfeg.remote.NetWorkStatusHelper
-import com.yupfeg.remote.R
+import com.yupfeg.test.R
 
 class MainActivity : AppCompatActivity() {
     private val mViewModel : MainViewModel by lazy(LazyThreadSafetyMode.NONE){
@@ -14,8 +14,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
+        setContentView(R.layout.activity_main)
         NetWorkStatusHelper.registerNetWorkStatusChange(this)
 
         findViewById<View>(R.id.btn_base_use_1).setOnClickListener {

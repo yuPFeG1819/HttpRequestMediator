@@ -1,4 +1,4 @@
-package com.yupfeg.remote.data.entity
+package com.yupfeg.test.data.entity
 
 import com.google.gson.annotations.SerializedName
 

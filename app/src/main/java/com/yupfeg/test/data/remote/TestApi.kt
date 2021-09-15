@@ -1,6 +1,6 @@
-package com.yupfeg.remote.data.remote
+package com.yupfeg.test.data.remote
 
-import com.yupfeg.remote.data.entity.HttpResultBean
+import com.yupfeg.test.data.entity.HttpResultBean
 import com.yupfeg.remote.url.UrlRedirectHelper
 import io.reactivex.rxjava3.core.Maybe
 import retrofit2.http.GET

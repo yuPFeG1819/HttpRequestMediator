@@ -214,8 +214,8 @@ object UrlRedirectHelper {
     }
 
     /**
-     * [Request]的拓展函数，尝试从原始请求头中，获取重定向url替换的文段数
-     * @return 如果请求头存在替换文段数，则返回int值，否则默认返回1，即只替换域名部分
+     * [Request]的拓展函数，尝试从原始请求的请求头中，获取重定向url替换的文段数
+     * @return 如果请求头存在替换文段数的标识，则返回int值的字符串，否则默认返回null，即只替换域名部分
      */
     @Throws(IllegalAccessException::class)
     private fun Request.obtainRedirectSegmentSize() : String?{

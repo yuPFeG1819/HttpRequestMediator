@@ -6,6 +6,9 @@ package com.yupfeg.remote.log
  * @date 2021/03/31
  */
 interface HttpLogPrinter {
+    /**是否开启输出日志操作*/
+    val isPrintLog : Boolean
+
     /**输出debug日志*/
     fun printDebugLog(tag : String, content : Any)
 

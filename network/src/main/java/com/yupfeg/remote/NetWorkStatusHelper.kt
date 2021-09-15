@@ -36,7 +36,10 @@ object NetWorkStatusHelper {
 
     private var mLogPrinter : HttpLogPrinter ?= null
 
-    /**网络状态*/
+    /**
+     * 网络状态
+     * //TODO 后续移除对RxJava的依赖
+     * */
     private val networkStatusSubject = BehaviorSubject.createDefault(
         NetWorkStatus.NONE
     )

@@ -1,10 +1,10 @@
-package com.yupfeg.remote.ui
+package com.yupfeg.test.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.yupfeg.remote.NetWorkStatusHelper
-import com.yupfeg.remote.data.remote.TestApi
-import com.yupfeg.remote.tools.httpApiDelegate
+import com.yupfeg.test.data.remote.TestApi
+import com.yupfeg.test.tools.httpApiDelegate
 import com.yupfeg.remote.url.UrlRedirectHelper
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable

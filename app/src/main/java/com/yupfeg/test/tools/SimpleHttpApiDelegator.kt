@@ -1,4 +1,4 @@
-package com.yupfeg.remote.tools
+package com.yupfeg.test.tools
 
 import com.yupfeg.logger.ext.setDslLoggerConfig
 import com.yupfeg.remote.HttpRequestMediator
@@ -21,11 +21,6 @@ inline fun <reified T> httpApiDelegate() = SimpleHttpApiDelegator(clazz = T::cla
 class SimpleHttpApiDelegator<T>(clazz: Class<T>)
     : BaseRequestApiDelegator<T>(clazz, HttpRequestMediator.DEFAULT_CLIENT_KEY){
     override fun addHttpRequestConfig(configKey: String) {
-        setDslLoggerConfig {
-            isDisplayClassInfo = false
-            isDisplayThreadInfo = false
-        }
-
         addDslRemoteConfig(configKey) {
             baseUrl = "https://api.juejin.cn/"
             connectTimeout = 5

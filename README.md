@@ -4,7 +4,7 @@
 
 - 支持RxJava3，简化RxJava对于网络请求的统一处理
 
-- 可自定义配置的日志输出
+- 可自定义配置的网络请求日志输出
 
 - 管理全局公共参数与请求头
 
@@ -12,7 +12,7 @@
 
 - 统一网络请求回调的预处理
 
-- 管理多种`Okhttp`与`Retrofit`配置，根据需要使用特定配置
+- 管理多种`Okhttp`与`Retrofit`配置，根据需要使用特定网络请求配置
 
 - 支持动态切换BaseUrl
 
@@ -131,11 +131,16 @@ class DataSource {
 
 ### 日志输出
 
-内部实现`HttpLogInterceptor`，用于打印输出网络请求`request`与`response`的日志
+内部已实现`HttpLogInterceptor`（已开放子类继承），用于打印输出网络请求`request`与`response`的日志
 
 > 推荐在设置网络配置时，设置给`networkInterceptors`，添加至**网络层拦截器的末尾**，避免遗漏重要日志。
+```kotlin
+addDslRemoteConfig(key){
+    networkInterceptors.add(HttpLogInterceptor(LoggerHttpLogPrinterImpl()))
+}
+```
 
-在创建`HttpLogInterceptor`时，可设置`HttpLogPrinter`，以自定义网络请求日志的输出策略。
+在创建`HttpLogInterceptor`时，需设置`HttpLogPrinter`，以自定义网络请求日志的输出策略。
 
 > 推荐外部调用时设置为统一的日志输出管理类，方便管理日志输出。
 
@@ -144,8 +149,8 @@ class DataSource {
 ### 网络状态监听
 
 内置了对网络状态变化的监听`NetWorkStatusHelper`
-
-> 兼容android 6.0以下
+> 目前暂时使用RxJava3 的`BehaviorSubject`类分发网络状态变化，待后续分离对于RxJava的依赖
+> 已兼容android 6.0以下
 
 step 1 : 注册网络状态监听（推荐只在全局注册一个，如`Application`）
 
@@ -177,7 +182,8 @@ fun unRegisterNetworkStatusChange(context : Context)
 
 ### 公共请求参数管理
 
-外部继承`BaseCommParamsInterceptor`，实现`commHeaders`与`commBodyParams`，分别添加固定的公共请求头与公共body参数
+1. 提供了`BaseCommParamsInterceptor`基础拦截器类，只需要实现`commHeaders`与`commBodyParams`，分别添加固定的公共请求头与公共body参数
+2. 直接继承`Interceptor`，正常添加okhttp拦截器方式
 
 
 
@@ -320,18 +326,19 @@ fun getUserData(...)
   直接设置`UrlRedirectHelper.globalReplaceSegmentSize`数量，即可全局忽略所有网络请求的部分文段
   
   
-
-可通过**实现`UrlReplaceable`接口创建新的url替换策略**，并调用`UrlRedirectHelper.setUrlReplacer`方法设置新替换策略
+- 更换url替换策略
+1. 可通过**实现`UrlReplaceable`接口创建新的url替换策略**，
+2. 调用`UrlRedirectHelper.setUrlReplacer`方法设置新替换策略
 
 #### httpUrl文段替换规则
 
 >
-> size = 0，表示只替换域名，新文段拼接在原始请求文段之前
+> size = 0，表示只替换域名，新文段拼接在原始请求文段之后
 > * 原始请求url： `https://www.baidu.com/user/sss?user_id=111` ,
 > * 重定向baseUrl：`https://www.google.com/test1/list/`,
 > * 新url：`https://www.google.com/user/test1/list/sss?user_id=111`,
 >
-> size = 1，只替换域名后的第一个文段。
+> size = 1，只替换域名后的第一个文段，新文段拼接在后面
 >
 > * 原始请求url：`https://www.baidu.com/user/sss?user_id=111`,
 > * 重定向baseUrl：`https://www.google.com/test1/list/`,
@@ -405,7 +412,7 @@ fun getUserData(...)
 - 简化`kotlin`协程的使用，提取通用协程response预处理操作
 - 逐步替换RxJava为kotlin协程 + `kotlin flow`
 - 优化下载功能，添加断点续传功能
-
+- 分离RxJava依赖
 
 
 ## thanks

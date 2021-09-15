@@ -36,9 +36,9 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
     /**是否允许自动重试*/
     protected var isRetryOnConnectionFailure : Boolean = false
 
-    /**应用层拦截器(先接收到请求，后接收到响应)列表，按顺序添加到okhttp*/
+    /**应用层拦截器(先接收到请求，后接收到响应)集合，按顺序添加*/
     protected val mInterceptors : MutableList<Interceptor> = mutableListOf()
-    /**网络层拦截器(先接收到响应，后接收到请求)列表，按顺序添加到okhttp*/
+    /**网络层拦截器(先接收到响应，后接收到请求)集合，按顺序添加*/
     protected val mNetworkInterceptors : MutableList<Interceptor> = mutableListOf()
     /**retrofit解析器的集合*/
     protected val mConverterFactories : MutableList<Converter.Factory> = mutableListOf()

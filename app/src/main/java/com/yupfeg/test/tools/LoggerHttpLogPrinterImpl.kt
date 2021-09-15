@@ -1,4 +1,4 @@
-package com.yupfeg.remote.tools
+package com.yupfeg.test.tools
 
 import com.yupfeg.logger.ext.logd
 import com.yupfeg.logger.ext.loge
@@ -7,6 +7,9 @@ import com.yupfeg.logger.ext.logw
 import com.yupfeg.remote.log.HttpLogPrinter
 
 class LoggerHttpLogPrinterImpl : HttpLogPrinter{
+    override val isPrintLog: Boolean
+        get() = true
+
     override fun printDebugLog(tag: String, content: Any) {
         logd(tag,content)
     }
