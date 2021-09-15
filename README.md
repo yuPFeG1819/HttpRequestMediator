@@ -131,9 +131,10 @@ class DataSource {
 
 ### 日志输出
 
-内部已实现`HttpLogInterceptor`（已开放子类继承），用于打印输出网络请求`request`与`response`的日志
+内部已实现`HttpLogInterceptor`（1.0.4版本后已开放子类继承），用于打印输出网络请求`request`与`response`的日志
 
 > 推荐在设置网络配置时，设置给`networkInterceptors`，添加至**网络层拦截器的末尾**，避免遗漏重要日志。
+> 1.0.4版本后，需要在配置时手动添加，没有内置任何不受外部控制的拦截器
 ```kotlin
 addDslRemoteConfig(key){
     networkInterceptors.add(HttpLogInterceptor(LoggerHttpLogPrinterImpl()))
