@@ -1,8 +1,9 @@
 ## HttpRequestMediator
 
-基于`Retofit`与`OkHttp`封装的网络请求库，利用kotlin特性简化网络请求api调用。
+基于`Retofit`与`OkHttp`封装的网络请求库，利用kotlin dsl特性简化网络请求api调用。
 
-- 支持RxJava3，简化RxJava对于网络请求的统一处理
+- ~~支持RxJava3，简化RxJava对于网络请求的统一处理~~（v1.0.5版本后已移除对于RxJava的依赖）
+- 提取对于网络请求的统一处理类
 
 - 可自定义配置的网络请求日志输出
 
@@ -131,7 +132,7 @@ class DataSource {
 
 ### 日志输出
 
-内部已实现`HttpLogInterceptor`（1.0.4版本后已开放子类继承），用于打印输出网络请求`request`与`response`的日志
+内部已实现`HttpLogInterceptor`（v1.0.4版本后已开放子类继承），用于打印输出网络请求`request`与`response`的日志
 
 > 推荐在设置网络配置时，设置给`networkInterceptors`，添加至**网络层拦截器的末尾**，避免遗漏重要日志。
 > 1.0.4版本后，需要在配置时手动添加，没有内置任何不受外部控制的拦截器
@@ -145,12 +146,38 @@ addDslRemoteConfig(key){
 
 > 推荐外部调用时设置为统一的日志输出管理类，方便管理日志输出。
 
+### 统一网络请求返回处理
+
+内部实现了`GlobalHttpResponseProcessor`的单例类（从v1.0.5版本开始）
+
+step 1 : 设置全局的网络请求业务处理类，实现`HttpResponseHandler`接口（推荐只在全局注册一个)
+```kotlin
+
+@JvmStatic
+fun setResponseHandler(handler: HttpResponseHandler)
+
+```
+
+step 2 : 在客户端的网络请求响应返回实体类实现`HttpResponseParsable`接口，
+同时在网络请求响应返回时先调用
+
+```kotlin
+GlobalHttpResponseProcessor.preHandleHttpResponse(response)
+```
+
+方法，通过前面实现`HttpResponseHandler`接口的类，判断是否满足接口执行成功状态（如响应状态码code == 200，具体看业务需求）。
+而在网络请求中出现的异常，则调用
+```kotlin
+GlobalHttpResponseProcessor.handleHttpError(throwable)
+```
+
+
 
 
 ### 网络状态监听
 
 内置了对网络状态变化的监听`NetWorkStatusHelper`
-> 目前暂时使用RxJava3 的`BehaviorSubject`类分发网络状态变化，待后续分离对于RxJava的依赖
+> ~~目前暂时使用RxJava3 的`BehaviorSubject`类分发网络状态变化，待后续分离对于RxJava的依赖~~（v1.0.5以后已移除RxJava3依赖）
 > 已兼容android 6.0以下
 
 step 1 : 注册网络状态监听（推荐只在全局注册一个，如`Application`）
@@ -163,7 +190,7 @@ fun registerNetWorkChange(context: Context)
 
 ```
 
-step 2 : 在需要的地方订阅网络状态变化（这里使用RxJava，后续替换为kotlin flow或者LiveData）
+step 2 : 在需要的地方订阅网络状态变化
 
 ``` kotlin
 @JvmStatic
@@ -190,7 +217,7 @@ fun unRegisterNetworkStatusChange(context : Context)
 
 ### 预处理请求回调
 
-> 目前仅支持RxJava3封装，对于kotlin协程需要外部手动封装
+> ~~目前仅支持RxJava3封装，对于kotlin协程需要外部手动封装~~（v1.0.5版本后已移除，可在sample模块查看）
 
 通过RxJava的`compose`操作符，创建`GlobalHttpTransformer`对象。
 
@@ -262,12 +289,15 @@ class HttpRequestConfig{
 
     /**https的ssl证书校验配置*/
     var sslSocketConfig : SSLSocketTrustConfig ?= null
+
+    /**网络请求事件监听，可监听网络请求指标数据*/
+    var eventListenerFactory : EventListener.Factory? = null
 }
 ```
 
-> - 默认添加了**日志打印**拦截器（网络层）、**动态替换baseUrl**的拦截器（应用层）。
+> - ~~默认添加了**日志打印**拦截器（网络层）~~（v1.0.5版本后已移除）、**动态替换baseUrl**的拦截器（应用层）。
 >
-> - 默认仅支持gson解析，`RxJava3`回调支持（kotlin协程自带支持，不需要额外添加）
+> - ~~默认仅支持gson解析，`RxJava3`回调支持（kotlin协程自带支持，不需要额外添加）~~（v1.0.5版本后已移除）
 
 
 
@@ -410,10 +440,10 @@ fun getUserData(...)
 
 ## TODO
 
-- 简化`kotlin`协程的使用，提取通用协程response预处理操作
-- 逐步替换RxJava为kotlin协程 + `kotlin flow`
+- ~~简化`kotlin`协程的使用，提取通用协程response预处理操作~~（已提取response预处理）
+- ~~逐步替换RxJava为kotlin协程kotlin flow~~(v1.0.5版本后已移除Rxjava)
 - 优化下载功能，添加断点续传功能
-- 分离RxJava依赖
+- ~~分离RxJava依赖~~（v1.0.5版本后已移除RxJava）
 
 
 ## thanks
