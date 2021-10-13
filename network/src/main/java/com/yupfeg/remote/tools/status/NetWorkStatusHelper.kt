@@ -174,8 +174,9 @@ object NetWorkStatusHelper {
     fun registerNetWorkStatusChange(context: Context,listener: NetworkStatusChangeListener){
         mNetworkStatusChangeListener = listener
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            val connectivityManager = context.applicationContext
-                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager = context.getSystemService(
+                Context.CONNECTIVITY_SERVICE
+            ) as ConnectivityManager
             connectivityManager.registerNetworkCallback(
                 NetworkRequest.Builder().build(),
                 netWorkStatusCallBack
@@ -185,7 +186,7 @@ object NetWorkStatusHelper {
             val filter = IntentFilter()
             @Suppress("DEPRECATION")
             filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
-            context.applicationContext.registerReceiver(oldVersionNetworkReceiver,filter)
+            context.registerReceiver(oldVersionNetworkReceiver,filter)
         }
     }
     /**注销网络状态变化监听*/
@@ -193,11 +194,12 @@ object NetWorkStatusHelper {
     @JvmStatic
     fun unRegisterNetworkStatusChange(context : Context){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            val connectivityManager = context.applicationContext
-                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager = context.getSystemService(
+                Context.CONNECTIVITY_SERVICE
+            ) as ConnectivityManager
             connectivityManager.unregisterNetworkCallback(netWorkStatusCallBack)
         }else{
-            context.applicationContext.unregisterReceiver(oldVersionNetworkReceiver)
+            context.unregisterReceiver(oldVersionNetworkReceiver)
         }
     }
 

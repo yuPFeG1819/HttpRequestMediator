@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
 import com.yupfeg.logger.ext.logd
 import com.yupfeg.remote.tools.status.NetWorkStatus
 import com.yupfeg.remote.tools.status.NetWorkStatusHelper

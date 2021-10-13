@@ -45,6 +45,7 @@ object GlobalHttpResponseProcessor {
      * @param responseBody 接口异常返回body内容
      *
      * */
+    @Suppress("unused")
     @JvmStatic
     fun handleHttpErrorBody(responseBody: ResponseBody){
         try {

@@ -178,26 +178,20 @@ GlobalHttpResponseProcessor.handleHttpError(throwable)
 
 内置了对网络状态变化的监听`NetWorkStatusHelper`
 > ~~目前暂时使用RxJava3 的`BehaviorSubject`类分发网络状态变化，待后续分离对于RxJava的依赖~~（v1.0.5以后已移除RxJava3依赖）
+> v1.0.5以后采用接口回调方式，实现`NetworkStatusChangeListener`接口
 > 已兼容android 6.0以下
 
-step 1 : 注册网络状态监听（推荐只在全局注册一个，如`Application`）
+step 1 : 注册网络状态监听（推荐只在全局注册一个）
 
 
 ``` kotlin
 
 @JvmStatic
-fun registerNetWorkChange(context: Context)
+fun registerNetWorkStatusChange(context: Context,listener: NetworkStatusChangeListener)
 
 ```
 
-step 2 : 在需要的地方订阅网络状态变化
-
-``` kotlin
-@JvmStatic
-fun observeNetWorkStatus() : Observable<NetWorkStatus>
-```
-
-step 3 : 在应用结束时，要取消注册网络状态监听
+step 2 : 在应用结束时，要注意取消注册网络状态监听
 
 ``` kotlin
 
