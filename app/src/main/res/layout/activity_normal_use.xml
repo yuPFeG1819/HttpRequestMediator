@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
+    >
+    <Button
+        android:id="@+id/btn_normal_use_rxjava3"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="使用RxJava3"
+        android:textSize="12sp"
+        tools:ignore="HardcodedText"
+        />
+
+    <Button
+        android:id="@+id/btn_normal_use_coroutine"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="使用kotlin协程"
+        android:textSize="12sp"
+        tools:ignore="HardcodedText"
+        />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="请求url : http://www.wanandroid.com/article/list/0/json \n 详细请求参数详见Logcat的输入日志"
+        tools:ignore="HardcodedText"
+        />
+
+    <TextView
+        android:id="@+id/tv_normal_use_result_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        tools:text="接口返回json内容"
+        android:textSize="14sp"
+        android:layout_weight="1"
+        android:layout_marginTop="15dp"
+        />
+</LinearLayout>

@@ -100,7 +100,7 @@ object HttpRequestMediator {
     /**
      * 添加网络请求工厂
      * @param configKey 配置标识符，标识特定配置的网络请求client
-     * @param factory [HttpClientFactory]实现类，网络请求工厂类对象
+     * @param factory [HttpClientFactory]实现类，网络请求配置工厂类对象
      * */
     @JvmStatic
     fun addHttpClientFactory(configKey: String = DEFAULT_CLIENT_KEY,
@@ -111,7 +111,7 @@ object HttpRequestMediator {
     }
 
     /**
-     * 尝试获取对应key的网络请求工厂
+     * 尝试获取对应key的网络请求配置工厂
      * @param configKey 配置标识符，标识特定配置的网络请求client
      * @return
      */

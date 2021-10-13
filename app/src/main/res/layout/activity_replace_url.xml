@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp">
+
+    <Button
+        android:id="@+id/btn_replace_url_jue_jin"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="请求掘金PC文章"
+        android:textSize="12sp"
+        />
+
+    <Button
+        android:id="@+id/btn_replace_url_baidu"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="请求百度查询"
+        android:textSize="12sp"
+        />
+
+    <TextView
+        android:id="@+id/tv_replace_url_query_url"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="请求url ： "
+        android:textSize="14sp"
+        android:layout_marginTop="15dp"
+        />
+
+    <TextView
+        android:id="@+id/tv_replace_url_query_result_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="请求返回json内容"
+        android:textSize="14sp"
+        android:layout_marginTop="15dp"
+        />
+
+
+</LinearLayout>

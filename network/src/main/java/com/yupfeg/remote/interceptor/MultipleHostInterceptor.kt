@@ -1,6 +1,6 @@
 package com.yupfeg.remote.interceptor
 
-import com.yupfeg.remote.url.UrlRedirectHelper
+import com.yupfeg.remote.tools.url.UrlRedirectHelper
 import okhttp3.Interceptor
 import okhttp3.Response
 

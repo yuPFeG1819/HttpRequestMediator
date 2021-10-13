@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp">
+
+    <androidx.core.widget.ContentLoadingProgressBar
+        android:id="@+id/progress_bar_download_apk"
+        android:layout_width="150dp"
+        android:layout_height="5dp"
+        tools:progress="70"
+        android:max="100"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:progressDrawable="@drawable/layer_progressbar_primary"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="20dp"
+        />
+
+    <TextView
+        android:id="@+id/tv_download_apk_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="下载进度：0%"
+        android:textSize="14sp"
+        android:layout_marginTop="15dp"
+        tools:ignore="HardcodedText"
+        />
+
+    <TextView
+        android:id="@+id/tv_download_apk_file_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="下载文件大小 ："
+        android:textSize="14sp"
+        android:layout_marginTop="5dp"
+        tools:ignore="HardcodedText"
+        />
+
+    <Button
+        android:id="@+id/btn_download_apk"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="开启下载"
+        android:textSize="14sp"
+        android:layout_marginTop="10dp"
+        tools:ignore="HardcodedText"
+        />
+
+
+</LinearLayout>

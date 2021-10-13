@@ -1,13 +1,11 @@
 package com.yupfeg.remote.config
 
-import com.google.gson.GsonBuilder
 import com.yupfeg.remote.interceptor.MultipleHostInterceptor
 import okhttp3.Cache
+import okhttp3.EventListener
 import okhttp3.Interceptor
 import retrofit2.CallAdapter
 import retrofit2.Converter
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 
@@ -21,7 +19,7 @@ class HttpRequestConfig{
     /**api域名*/
     var baseUrl : String ?= null
     /**链接超时时间，单位s*/
-    var connectTimeout : Long = 5
+    var connectTimeout : Long = 10
     /**读取超时时间，单位s*/
     var readTimeout : Long = 10
     /**写入上传的超时时间，单位s*/
@@ -35,6 +33,7 @@ class HttpRequestConfig{
     /**
      * 网络响应的本地缓存
      * * `Cache(file = 缓存文件,size = 最大缓存大小)`
+     * * Android 10以下版本需要本地读写权限
      * */
     var responseCache : Cache ?= null
 
@@ -51,25 +50,15 @@ class HttpRequestConfig{
     /**https的ssl证书校验配置*/
     var sslSocketConfig : SSLSocketTrustConfig ?= null
 
+    /**网络请求事件监听，可监听网络请求指标数据*/
+    var eventListenerFactory : EventListener.Factory? = null
+
     init {
         applicationInterceptors.apply {
             //默认添加动态切换baseUrl的拦截器
             add(MultipleHostInterceptor())
         }
-
-        //json解析器（按添加顺序尝试解析）
-        converterFactories.apply {
-            //gson解析
-            add(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
-            //fastjson解析
-            //add(FastJsonConverterFactory.create())
-        }
-        //请求响应回调支持
-        callAdapterFactories.apply {
-            // 添加对RxJava3支持，利用RxJava3对事件流进行操作
-            // (create()表示执行同步请求，createAsync()执行异步请求，交由okHttp线程池维护)
-            add(RxJava3CallAdapterFactory.create())
-        }
+        //json解析器与回调类型支持都交由外部决定添加内容
     }
 }
 

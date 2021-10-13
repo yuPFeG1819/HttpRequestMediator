@@ -41,9 +41,8 @@ abstract class BaseCommParamsInterceptor : Interceptor{
             }
         }
         //-------------添加公用的参数------------------
-        if (request.body is FormBody) {
-            addPostBasicParamsToBuilder(request, builder)
-        }
+        addPostBasicParamsToBuilder(request, builder)
+
         request.body?.contentType()?.charset(UTF8)
 
         return chain.proceed(builder.build())
@@ -55,7 +54,7 @@ abstract class BaseCommParamsInterceptor : Interceptor{
      * @param oldRequest 原始请求
      * @param builder   新请求构造体
      */
-    private fun addPostBasicParamsToBuilder(oldRequest: Request, builder: Request.Builder) {
+    protected open fun addPostBasicParamsToBuilder(oldRequest: Request, builder: Request.Builder) {
         //POST请求表单提交(判断非空)
         val oldFormBody = oldRequest.body as? FormBody
         oldFormBody?:return
