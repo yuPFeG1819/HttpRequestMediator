@@ -19,6 +19,7 @@ interface OnUploadProgressListener{
 
 /**
  * 监听上传进度的[RequestBody]代理类
+ * maybe since v1.0.6
  * @author yuPFeG
  * @date 2021/10/14
  */
