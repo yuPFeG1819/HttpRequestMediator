@@ -28,6 +28,8 @@ data class DownloadProgressBean(
          * 创建下载失败bean
          * @param fileTag 文件下载地址，作为唯一标识符
          * */
+        @Suppress("unused")
+        @JvmStatic
         fun createDownloadFailure(fileTag: String) : DownloadProgressBean{
             return DownloadProgressBean(
                 fileTag = fileTag,progress = 0f,

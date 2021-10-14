@@ -8,7 +8,6 @@ import okio.*
 
 /**
  * 监听文件下载进度的 ResponseBody
- * * 暂不支持断点续传
  * @author yuPFeG
  * @date 2020/04/23
  */
@@ -38,18 +37,22 @@ class DownProgressResponseBody(
 
     private fun source(source : Source) : Source{
         return object : ForwardingSource(source){
-            var downloadBytes : Long = 0L
+            private var downloadBytes : Long = 0L
+            private var mTotalBytes : Long = 0L
             override fun read(sink: Buffer, byteCount: Long): Long {
                 val bytesRead = super.read(sink, byteCount)
                 //增加当前读取的字节数，如果读取完成了bytesRead会返回-1
                 downloadBytes += if ((-1).toLong() != bytesRead ) bytesRead else 0
-                val totalBytes = responseBody.contentLength()
-                val progress = if(totalBytes <= 0) 0f
-                else (downloadBytes.toFloat() / totalBytes) * 100
+                if (mTotalBytes <= 0){
+                    //避免多次调用contentLength
+                    mTotalBytes = contentLength()
+                }
+                val progress = if(mTotalBytes <= 0) 0f
+                else (downloadBytes.toFloat() / mTotalBytes) * 100
                 logPrinter?.printDebugLog(
                     logTag,"file download result-------->> fileTag : $fileUrl \n " +
                         "downloaded bytes ：$downloadBytes \n " +
-                        "total download bytes ： ${responseBody.contentLength()}," +
+                        "total download bytes ： ${mTotalBytes}," +
                             "\n downloaded progress ：$progress"
                 )
                 onProgressChangeAction?.invoke(

@@ -1,8 +1,5 @@
 package com.yupfeg.sample.tools.download
 
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
 import com.jakewharton.rxrelay3.PublishRelay
 import com.yupfeg.remote.HttpRequestMediator
 import com.yupfeg.remote.config.HttpRequestConfig
@@ -18,7 +15,6 @@ import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import okhttp3.Interceptor
-import okhttp3.ResponseBody
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 
 /**
@@ -32,37 +28,17 @@ class ApkFileDownloadProducer(
     private val requestConfig : HttpRequestConfig
 ) : BaseFileDownloadProducer(){
 
-//    companion object{
-//        private const val PROGRESS_MSG_TAG = 0x1001
-//    }
-
-
     private val mDownloadApiService : DownloadApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         HttpRequestMediator.createRequestApi(
             requestTag, DownloadApiService::class.java
         )
     }
 
-    /**文件下载进度变化监听*/
-    private var mOnDownloadProgressListener : ((DownloadProgressBean)->Unit)? = null
-
     /**
      * 文件下载进度百分比的可观察对象，
      * [PublishRelay]只有onNext的subject，不会因为OnError中断信息
      * */
     private val mDownloadProgressSubject = PublishRelay.create<DownloadProgressBean>()
-
-//    private val mHandler : Handler = object : Handler(Looper.getMainLooper()){
-//
-//        override fun handleMessage(msg: Message) {
-//            super.handleMessage(msg)
-//            if (msg.what != PROGRESS_MSG_TAG) return
-//
-//            (msg.obj as? DownloadProgressBean)?.also {
-//                mOnDownloadProgressListener?.invoke(it)
-//            }
-//        }
-//    }
 
     init {
         HttpRequestMediator.addDefaultHttpClientFactory (requestTag){
@@ -129,9 +105,6 @@ class ApkFileDownloadProducer(
     }
 
     private fun sendDownloadProgressChange(progressBean: DownloadProgressBean){
-//        val message = mHandler.obtainMessage()
-//        message.what = PROGRESS_MSG_TAG
-//        message.obj = progressBean
         mDownloadProgressSubject.accept(progressBean)
     }
 
