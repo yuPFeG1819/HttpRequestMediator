@@ -46,17 +46,17 @@ class HttpRequestConfig{
 
     /**应用层拦截器*/
     @JvmField
-    val applicationInterceptors : MutableList<Interceptor> = mutableListOf()
+    var applicationInterceptors : MutableList<Interceptor> = mutableListOf()
     /**网络层拦截器*/
     @JvmField
-    val networkInterceptors : MutableList<Interceptor> = mutableListOf()
+    var networkInterceptors : MutableList<Interceptor> = mutableListOf()
 
     /**retrofit解析器的集合*/
     @JvmField
-    val converterFactories : MutableList<Converter.Factory> = mutableListOf()
+    var converterFactories : MutableList<Converter.Factory> = mutableListOf()
     /**retrofit回调支持类的集合*/
     @JvmField
-    val callAdapterFactories : MutableList<CallAdapter.Factory> = mutableListOf()
+    var callAdapterFactories : MutableList<CallAdapter.Factory> = mutableListOf()
 
     /**https的ssl证书校验配置*/
     @JvmField
