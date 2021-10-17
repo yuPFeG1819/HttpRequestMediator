@@ -17,17 +17,23 @@ import javax.net.ssl.X509TrustManager
  */
 class HttpRequestConfig{
     /**api域名*/
+    @JvmField
     var baseUrl : String ?= null
     /**链接超时时间，单位s*/
+    @JvmField
     var connectTimeout : Long = 10
     /**读取超时时间，单位s*/
+    @JvmField
     var readTimeout : Long = 10
     /**写入上传的超时时间，单位s*/
+    @JvmField
     var writeTimeout : Long = 15
 
     /**是否允许代理*/
+    @JvmField
     var isAllowProxy : Boolean = false
     /**是否在连接失败后自动重试，默认为false，在外部自行处理重试逻辑*/
+    @JvmField
     var isRetryOnConnectionFailure : Boolean = false
 
     /**
@@ -35,22 +41,29 @@ class HttpRequestConfig{
      * * `Cache(file = 缓存文件,size = 最大缓存大小)`
      * * Android 10以下版本需要本地读写权限
      * */
+    @JvmField
     var responseCache : Cache ?= null
 
     /**应用层拦截器*/
-    var applicationInterceptors : MutableList<Interceptor> = mutableListOf()
+    @JvmField
+    val applicationInterceptors : MutableList<Interceptor> = mutableListOf()
     /**网络层拦截器*/
-    var networkInterceptors : MutableList<Interceptor> = mutableListOf()
+    @JvmField
+    val networkInterceptors : MutableList<Interceptor> = mutableListOf()
 
     /**retrofit解析器的集合*/
-    var converterFactories : MutableList<Converter.Factory> = mutableListOf()
+    @JvmField
+    val converterFactories : MutableList<Converter.Factory> = mutableListOf()
     /**retrofit回调支持类的集合*/
-    var callAdapterFactories : MutableList<CallAdapter.Factory> = mutableListOf()
+    @JvmField
+    val callAdapterFactories : MutableList<CallAdapter.Factory> = mutableListOf()
 
     /**https的ssl证书校验配置*/
+    @JvmField
     var sslSocketConfig : SSLSocketTrustConfig ?= null
 
     /**网络请求事件监听，可监听网络请求指标数据*/
+    @JvmField
     var eventListenerFactory : EventListener.Factory? = null
 
     init {
