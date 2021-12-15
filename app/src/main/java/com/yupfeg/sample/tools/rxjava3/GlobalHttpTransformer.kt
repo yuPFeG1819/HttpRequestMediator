@@ -1,6 +1,6 @@
 package com.yupfeg.sample.tools.rxjava3
 
-import com.yupfeg.remote.tools.pool.GlobalHttpThreadPoolExecutor
+import com.yupfeg.sample.tools.pool.GlobalHttpThreadPoolExecutor
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.functions.Function

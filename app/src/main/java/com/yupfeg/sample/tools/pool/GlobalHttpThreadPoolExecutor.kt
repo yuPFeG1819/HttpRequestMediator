@@ -1,4 +1,4 @@
-package com.yupfeg.remote.tools.pool
+package com.yupfeg.sample.tools.pool
 
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadFactory

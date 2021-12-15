@@ -1,9 +1,7 @@
 package com.yupfeg.remote.config
 
 import com.yupfeg.remote.interceptor.MultipleHostInterceptor
-import okhttp3.Cache
-import okhttp3.EventListener
-import okhttp3.Interceptor
+import okhttp3.*
 import retrofit2.CallAdapter
 import retrofit2.Converter
 import javax.net.ssl.SSLSocketFactory
@@ -15,10 +13,25 @@ import javax.net.ssl.X509TrustManager
  * @author yuPFeG
  * @date 2021/01/25
  */
-class HttpRequestConfig{
+
+@Suppress("unused")
+class HttpRequestConfig constructor(){
+
+    // <editor-fold desc="retrofit配置">
     /**api域名*/
     @JvmField
     var baseUrl : String ?= null
+
+    /**retrofit解析器的集合*/
+    @JvmField
+    var converterFactories : MutableList<Converter.Factory> = mutableListOf()
+    /**retrofit回调支持类的集合*/
+    @JvmField
+    var callAdapterFactories : MutableList<CallAdapter.Factory> = mutableListOf()
+
+    // </editor-fold>
+
+    // <editor-fold desc="okhttp配置">
     /**链接超时时间，单位s*/
     @JvmField
     var connectTimeout : Long = 10
@@ -35,7 +48,6 @@ class HttpRequestConfig{
     /**是否在连接失败后自动重试，默认为false，在外部自行处理重试逻辑*/
     @JvmField
     var isRetryOnConnectionFailure : Boolean = false
-
     /**
      * 网络响应的本地缓存
      * * `Cache(file = 缓存文件,size = 最大缓存大小)`
@@ -51,20 +63,22 @@ class HttpRequestConfig{
     @JvmField
     var networkInterceptors : MutableList<Interceptor> = mutableListOf()
 
-    /**retrofit解析器的集合*/
-    @JvmField
-    var converterFactories : MutableList<Converter.Factory> = mutableListOf()
-    /**retrofit回调支持类的集合*/
-    @JvmField
-    var callAdapterFactories : MutableList<CallAdapter.Factory> = mutableListOf()
-
     /**https的ssl证书校验配置*/
     @JvmField
     var sslSocketConfig : SSLSocketTrustConfig ?= null
 
-    /**网络请求事件监听，可监听网络请求指标数据*/
+    /**
+     * okhttp配置，如果需要更多拓展配置需要可以直接传入build对象
+     * * 优先级默认最高，忽略所有其他okhttp快捷配置
+     * */
     @JvmField
-    var eventListenerFactory : EventListener.Factory? = null
+    var okhttpClientBuilder : OkHttpClient.Builder?= null
+
+    // </editor-fold>
+
+    constructor(okhttpBuilder : OkHttpClient.Builder) : this(){
+        okhttpClientBuilder = okhttpBuilder
+    }
 
     init {
         applicationInterceptors.apply {
@@ -73,6 +87,7 @@ class HttpRequestConfig{
         }
         //json解析器与回调类型支持都交由外部决定添加内容
     }
+
 }
 
 /**https的ssl证书校验配置*/

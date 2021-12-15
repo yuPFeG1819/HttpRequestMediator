@@ -12,7 +12,7 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 
 /**
- * 创建网络请求client对象的工厂基类
+ * 创建网络请求对象的工厂基础实现类
  * @author yuPFeG
  * @date 2021/02/09
  */
@@ -51,14 +51,11 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
     /**网络响应的本地缓存*/
     protected var mResponseFileCache : Cache?= null
 
-    /**网络请求数据指标的监听*/
-    protected var mEventListenerFactory : EventListener.Factory? = null
-
     /**
-     * okhttp异步网络请求任务调度器
-     * * 默认使用全局的网络请求线程池
+     * okhttp的默认配置类
+     * * 默认优先级最高，会直接使用这个builder进行配置，忽略所有其他快捷方式
      * */
-    protected var mRequestDispatcher : Dispatcher? = null
+    protected var mOkHttpClientBuilder : OkHttpClient.Builder? = null
 
     // </editor-fold>
 
@@ -94,13 +91,16 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
             .addCallAdapterFactories(config.callAdapterFactories)
             .setSSLSocketFactory(config.sslSocketConfig?.sslSocketFactory)
             .setX509TrustManager(config.sslSocketConfig?.x509TrustManager)
-            .setEventListenerFactory(config.eventListenerFactory)
     }
 
     /**
      * 创建[OkHttpClient]实例对象
      */
-    protected open fun performCreateOkHttpClient() : OkHttpClient{
+    protected open fun buildOkHttpClientInstance() : OkHttpClient{
+        mOkHttpClientBuilder?.also {
+            return it.build()
+        }
+
         val builder = OkHttpClient.Builder()
         //缓存
         mResponseFileCache?.also { builder.cache(it) }
@@ -122,15 +122,6 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
 
         // </editor-fold>
 
-        // <editor-fold desc="网络优化相关">
-
-        //网络性能监听
-        mEventListenerFactory?.also {
-            builder.eventListenerFactory(it)
-        }
-
-        // </editor-fold>
-
         // <editor-fold desc="其他杂项">
         //代理访问权限
         takeIf { !mAllowProxy }?.run { builder.proxy(Proxy.NO_PROXY) }
@@ -141,8 +132,10 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
         }
         //自动断线重连（默认为false）
         builder.retryOnConnectionFailure(isRetryOnConnectionFailure)
+
         // </editor-fold>
 
+        mOkHttpClientBuilder = builder
         return builder.build()
     }
 
@@ -150,7 +143,7 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
      * 创建Retrofit实例
      * @param okHttpClient [OkHttpClient]实例
      */
-    protected fun performCreateRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    protected fun buildRetrofitInstance(okHttpClient: OkHttpClient): Retrofit {
         val builder = Retrofit.Builder()
         builder.baseUrl(mBaseUrl)
         //------添加解析器(按添加顺序尝试解析)---------
@@ -332,27 +325,5 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
         return this
     }
 
-    /**
-     * 设置http请求指标监控
-     * @param eventListenerFactory 监听的工程类，根据网络请求地址key创建对应的监听对象
-     * @return [BaseHttpClientFactoryImpl]类本身，便于链式调用
-     */
-    fun setEventListenerFactory(eventListenerFactory : EventListener.Factory?) : BaseHttpClientFactoryImpl{
-        eventListenerFactory ?: return this
-        this.mEventListenerFactory = eventListenerFactory
-        return this
-    }
-
-    /**
-     * 设置网络请求任务调度器
-     * @param dispatcher
-     * @return [BaseHttpClientFactoryImpl]类本身，便于链式调用
-     */
-    @Suppress("unused")
-    fun setDispatcher(dispatcher: Dispatcher?) : BaseHttpClientFactoryImpl{
-        dispatcher?:return this
-        this.mRequestDispatcher = dispatcher
-        return this
-    }
     //</editor-fold>
 }

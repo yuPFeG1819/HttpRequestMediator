@@ -7,7 +7,7 @@ import com.yupfeg.remote.download.BaseFileDownloadProducer
 import com.yupfeg.remote.download.entity.DownloadProgressBean
 import com.yupfeg.remote.interceptor.DownloadProgressInterceptor
 import com.yupfeg.remote.log.HttpLogPrinter
-import com.yupfeg.remote.tools.pool.GlobalHttpThreadPoolExecutor
+import com.yupfeg.sample.tools.pool.GlobalHttpThreadPoolExecutor
 import com.yupfeg.sample.data.remote.DownloadApiService
 import com.yupfeg.sample.tools.LoggerHttpLogPrinterImpl
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers

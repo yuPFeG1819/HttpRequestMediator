@@ -7,7 +7,8 @@ package com.yupfeg.sample.data.entity
  * @date 2021/09/24
  */
 data class LoginResultEntity(
-    val data : DataEntity? = null
+    val data : DataEntity? = null,
+    var other : Int
 ) : WanAndroidHttpResponseEntity() {
     // 登录数据
     data class DataEntity(
@@ -21,4 +22,6 @@ data class LoginResultEntity(
         val type: Int,
         val username: String
     )
+
+    var test : String? = null
 }

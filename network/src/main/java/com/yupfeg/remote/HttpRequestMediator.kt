@@ -63,10 +63,12 @@ object HttpRequestMediator {
         return getRetrofitInstance(configKey).create(clazz)
     }
 
+    //TODO 发起websock长链接
+
     /**
      * 是否包含指定的配置标识符
      * @param configKey 配置标识符，标识特定配置的网络请求client
-     * @return
+     * @return true - 表示已添加指定配置
      */
     @JvmStatic
     fun containsRequestKey(configKey: String) : Boolean{

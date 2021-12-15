@@ -36,7 +36,11 @@ dependencies {
 }
 ```
 
-
+## 更新日志
+- v1.0.6
+移除提供的线程池，方便外部应用统一线程调度
+- v1.0.5
+移除RxJava依赖
 
 ## 基础使用
 
@@ -438,7 +442,7 @@ fun getUserData(...)
 - ~~逐步替换RxJava为kotlin协程kotlin flow~~(v1.0.5版本后已移除Rxjava)
 - 优化下载功能，添加断点续传功能
 - ~~分离RxJava依赖~~（v1.0.5版本后已移除RxJava）
-
+- 增加简化WebSocket的支持
 
 ## thanks
 

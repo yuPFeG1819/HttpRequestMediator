@@ -6,7 +6,6 @@ import retrofit2.Retrofit
 
 /**
  * 默认实现的网络请求实例工厂类
- * * 提供默认配置的OkHttpClient实例
  * @author yuPFeG
  * @date 2021/02/10
  */
@@ -43,7 +42,7 @@ class DefaultHttpClientFactoryImpl private constructor() : BaseHttpClientFactory
      */
     override fun getRetrofitInstance(): Retrofit {
         return mRetrofit ?: synchronized(this){
-            mRetrofit ?: performCreateRetrofit(getOkHttpClientInstance()).apply { mRetrofit = this }
+            mRetrofit ?: buildRetrofitInstance(getOkHttpClientInstance()).apply { mRetrofit = this }
         }
     }
 
@@ -53,7 +52,7 @@ class DefaultHttpClientFactoryImpl private constructor() : BaseHttpClientFactory
      * */
     override fun getOkHttpClientInstance(): OkHttpClient {
         return mOkHttpClient ?: synchronized(this){
-            mOkHttpClient ?: performCreateOkHttpClient().apply { mOkHttpClient = this }
+            mOkHttpClient ?: buildOkHttpClientInstance().apply { mOkHttpClient = this }
         }
     }
 
