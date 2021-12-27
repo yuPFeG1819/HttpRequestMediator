@@ -78,19 +78,23 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
             throw NullPointerException("you must set baseUrl to HttpClientFactory")
         }
 
-        return this.setBaseUrl(config.baseUrl?:"")
-            .setResponseFileCache(config.responseCache)
-            .setRetryOnConnectionFailure(config.isRetryOnConnectionFailure)
-            .setConnectTimeout(config.connectTimeout)
-            .setReadTimeout(config.readTimeout)
-            .setWriteTimeout(config.writeTimeout)
-            .setAllowProxy(config.isAllowProxy)
-            .addInterceptors(config.applicationInterceptors)
-            .addNetworkInterceptors(config.networkInterceptors)
+        val impl = this.setBaseUrl(config.baseUrl?:"")
             .addConverterFactories(config.converterFactories)
             .addCallAdapterFactories(config.callAdapterFactories)
-            .setSSLSocketFactory(config.sslSocketConfig?.sslSocketFactory)
-            .setX509TrustManager(config.sslSocketConfig?.x509TrustManager)
+        return if (config.okhttpClientBuilder != null){ //以okhttp build类配置优先
+            impl.setOkHttpBuilder(config.okhttpClientBuilder)
+        }else {
+            impl.setResponseFileCache(config.responseCache)
+                .setRetryOnConnectionFailure(config.isRetryOnConnectionFailure)
+                .setConnectTimeout(config.connectTimeout)
+                .setReadTimeout(config.readTimeout)
+                .setWriteTimeout(config.writeTimeout)
+                .setAllowProxy(config.isAllowProxy)
+                .addInterceptors(config.applicationInterceptors)
+                .addNetworkInterceptors(config.networkInterceptors)
+                .setSSLSocketFactory(config.sslSocketConfig?.sslSocketFactory)
+                .setX509TrustManager(config.sslSocketConfig?.x509TrustManager)
+        }
     }
 
     /**
@@ -322,6 +326,17 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
     fun setResponseFileCache(cache: Cache?) : BaseHttpClientFactoryImpl {
         cache ?: return this
         this.mResponseFileCache = cache
+        return this
+    }
+
+    /**
+     * 设置完整的okhttp配置类
+     * @param builder
+     * @return [BaseHttpClientFactoryImpl]类本身，便于链式调用
+     * */
+    fun setOkHttpBuilder(builder : OkHttpClient.Builder?) : BaseHttpClientFactoryImpl{
+        builder ?: return this
+        this.mOkHttpClientBuilder = builder
         return this
     }
 

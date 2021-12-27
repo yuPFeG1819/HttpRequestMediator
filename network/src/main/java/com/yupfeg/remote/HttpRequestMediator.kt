@@ -17,6 +17,7 @@ import kotlin.jvm.Throws
  *
  * 2.调用[getRetrofitInstance]获取[Retrofit]实例，来创建请求api对象，
  * 或者直接调用[createRequestApi]创建请求api对象
+ * test cherry-pick
  *
  * @author yuPFeG
  * @date 2021/01/25
@@ -81,8 +82,10 @@ object HttpRequestMediator {
      * @param init 用于kotlin DSL方式配置网络请求参数[HttpRequestConfig]
      * */
     @JvmStatic
-    fun addDefaultHttpClientFactory(configKey: String = DEFAULT_CLIENT_KEY,
-                                    init : HttpRequestConfig.()->Unit) : HttpRequestMediator {
+    fun addDefaultHttpClientFactory(
+        configKey: String = DEFAULT_CLIENT_KEY,
+        init : HttpRequestConfig.()->Unit
+    ) : HttpRequestMediator {
         mHttpClientFactories[configKey] = DefaultHttpClientFactoryImpl.create(init)
         return this
     }
@@ -93,8 +96,10 @@ object HttpRequestMediator {
      * @param config 网络请求参数配置[HttpRequestConfig]
      * */
     @JvmStatic
-    fun addDefaultHttpClientFactory(configKey: String = DEFAULT_CLIENT_KEY,
-                                    config: HttpRequestConfig) : HttpRequestMediator{
+    fun addDefaultHttpClientFactory(
+        configKey: String = DEFAULT_CLIENT_KEY,
+        config: HttpRequestConfig
+    ) : HttpRequestMediator{
         mHttpClientFactories[configKey] = DefaultHttpClientFactoryImpl.create(config)
         return this
     }
@@ -105,8 +110,9 @@ object HttpRequestMediator {
      * @param factory [HttpClientFactory]实现类，网络请求配置工厂类对象
      * */
     @JvmStatic
-    fun addHttpClientFactory(configKey: String = DEFAULT_CLIENT_KEY,
-                             factory: HttpClientFactory
+    fun addHttpClientFactory(
+        configKey: String = DEFAULT_CLIENT_KEY,
+        factory: HttpClientFactory
     ) : HttpRequestMediator {
         mHttpClientFactories[configKey] = factory
         return this
