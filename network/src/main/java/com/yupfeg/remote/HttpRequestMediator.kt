@@ -17,7 +17,6 @@ import kotlin.jvm.Throws
  *
  * 2.调用[getRetrofitInstance]获取[Retrofit]实例，来创建请求api对象，
  * 或者直接调用[createRequestApi]创建请求api对象
- * test cherry-pick
  *
  * @author yuPFeG
  * @date 2021/01/25
