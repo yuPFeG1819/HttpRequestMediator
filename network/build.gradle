@@ -16,7 +16,6 @@ group = "com.gitee.yupfeg"
 
 android {
     compileSdkVersion config.compileVersion
-    buildToolsVersion config.buildToolsVersion
 
     defaultConfig {
         minSdkVersion config.minSdk

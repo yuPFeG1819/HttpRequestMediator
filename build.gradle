@@ -1,10 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 ext {
     config = [
-            buildToolsVersion: "30.0.3",
-            compileVersion   : 30,
+            buildToolsVersion: "31.0.2",
+            compileVersion   : 31,
             minSdk           : 21,
-            targetSdk        : 30
+            targetSdk        : 31
     ]
 
     dependencies = [
