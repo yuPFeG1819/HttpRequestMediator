@@ -3,7 +3,8 @@
 基于`Retofit`与`OkHttp`封装的网络请求库，利用kotlin dsl特性简化网络请求api调用。
 
 - ~~支持RxJava3，简化RxJava对于网络请求的统一处理~~（v1.0.5版本后已移除对于RxJava的依赖）
-- 提取对于网络请求的统一处理类
+  
+- 提取对于网络请求的统一处理入口类，由外部注入具体处理策略
 
 - 可自定义配置的网络请求日志输出
 
@@ -11,8 +12,8 @@
 
 - 网络状态监听
 
-- 统一网络请求回调的预处理
-
+- 提供文件上传，文件下载的进度监听的功能
+  
 - 管理多种`Okhttp`与`Retrofit`配置，根据需要使用特定网络请求配置
 
 - 支持动态切换BaseUrl
@@ -37,10 +38,16 @@ dependencies {
 ```
 
 ## 更新日志
+- v1.0.7
+  1. 新增`OkHttpClient`对于`cookies`持久化以及自动重定向的快捷配置
 - v1.0.6
-移除提供的线程池，方便外部应用统一线程调度
+  1. 移除内部提供的线程池，方便外部项目统一线程池调度
+  2. 在`HttpRequestConfig`中提供`OkHttpClient.Builder`配置，优先级最高，用于其他不常用参数配置
 - v1.0.5
-移除RxJava依赖
+  1. 移除RxJava依赖
+- v1.0.4
+  1. 优化默认实现的日志输出拦截器，开放子类集成
+  2. 移除默认添加的日志拦截器，完全交由外部配置添加
 
 ## 基础使用
 
@@ -139,7 +146,7 @@ class DataSource {
 内部已实现`HttpLogInterceptor`（v1.0.4版本后已开放子类继承），用于打印输出网络请求`request`与`response`的日志
 
 > 推荐在设置网络配置时，设置给`networkInterceptors`，添加至**网络层拦截器的末尾**，避免遗漏重要日志。
-> 1.0.4版本后，需要在配置时手动添加，没有内置任何不受外部控制的拦截器
+> 1.0.4版本后，需要在配置时手动添加，不再内置任何不受外部控制的拦截器
 ```kotlin
 addDslRemoteConfig(key){
     networkInterceptors.add(HttpLogInterceptor(LoggerHttpLogPrinterImpl()))
@@ -293,7 +300,7 @@ class HttpRequestConfig{
 }
 ```
 
-> - ~~默认添加了**日志打印**拦截器（网络层）~~（v1.0.5版本后已移除）、**动态替换baseUrl**的拦截器（应用层）。
+> - ~~默认添加了**日志打印**拦截器（网络层）~~（v1.0.5版本后已移除）、默认添加**支持动态替换baseUrl**的拦截器（应用层）。
 >
 > - ~~默认仅支持gson解析，`RxJava3`回调支持（kotlin协程自带支持，不需要额外添加）~~（v1.0.5版本后已移除）
 
@@ -309,7 +316,8 @@ class HttpRequestConfig{
 
 **stage 2**
 
-在网络请求API声明处，添加`@Headers("${REDIRECT_HOST_HEAD_PREFIX}${URL_KEY}")`请求头
+在网络请求API声明处，添加`@Headers("${UrlRedirectHelper.REDIRECT_HOST_HEAD_PREFIX}${URL_KEY}")`请求头
+> 注意`UrlRedirectHelper.REDIRECT_HOST_HEAD_PREFIX`为必须标识符，只有这个标识才能确定开启动态替换url功能
 
 ``` kotlin
 @Headers("${UrlRedirectHelper.REDIRECT_HOST_HEAD_PREFIX}user")
@@ -317,7 +325,7 @@ class HttpRequestConfig{
 fun getUserData(...)
 ```
 
-#### 替换策略
+#### Url替换策略
 
 默认的动态替换策略为`DefaultUrlReplacer`
 
@@ -356,6 +364,7 @@ fun getUserData(...)
   
   
 - 更换url替换策略
+
 1. 可通过**实现`UrlReplaceable`接口创建新的url替换策略**，
 2. 调用`UrlRedirectHelper.setUrlReplacer`方法设置新替换策略
 
