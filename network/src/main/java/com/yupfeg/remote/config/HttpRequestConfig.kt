@@ -45,12 +45,22 @@ class HttpRequestConfig constructor(){
     /**是否允许代理*/
     @JvmField
     var isAllowProxy : Boolean = false
-    /**是否在连接失败后自动重试，默认为false，在外部自行处理重试逻辑*/
+
+    /**
+     * 是否在连接失败后自动重试，默认为false，
+     * - 建议在外部自行处理重试逻辑，如果设置为true，最多重试20次，包含重定向等次数
+     * */
     @JvmField
     var isRetryOnConnectionFailure : Boolean = false
     /**
+     * 是否在code = 300 、301 、302 、303 、307 、308 的情况下，自动进行重定向操作，默认为true。
+     * - 推荐在外部自行处理重定向逻辑，默认最多支持20次，包含连接错误次数
+     * */
+    @JvmField
+    var isFollowRedirects : Boolean = true
+    /**
      * 网络响应的本地缓存
-     * * `Cache(file = 缓存文件,size = 最大缓存大小)`
+     * * 如`Cache(file = 缓存文件,size = 最大缓存字节大小)`
      * * Android 10以下版本需要本地读写权限
      * */
     @JvmField
@@ -66,6 +76,13 @@ class HttpRequestConfig constructor(){
     /**https的ssl证书校验配置*/
     @JvmField
     var sslSocketConfig : SSLSocketTrustConfig ?= null
+
+    /**
+     * 持久化Cookie的工具
+     * - 在`OkHttp`内置的`BridgeInterceptor`拦截器内被调用，避免外部手动添加拦截器进行缓存
+     * */
+    @JvmField
+    var cookieJar : CookieJar? = null
 
     /**
      * okhttp配置，如果需要更多拓展配置需要可以直接传入build对象

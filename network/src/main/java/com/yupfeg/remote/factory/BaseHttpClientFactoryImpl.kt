@@ -32,8 +32,10 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
 
     /**是否允许使用代理访问*/
     protected var mAllowProxy : Boolean = true
-    /**是否允许自动重试*/
+    /**是否允许自动重试，默认为false*/
     protected var isRetryOnConnectionFailure : Boolean = false
+    /**是否允许自动重定向，默认为true*/
+    protected var isFollowRedirects : Boolean = true
 
     /**应用层拦截器(先接收到请求，后接收到响应)集合，按顺序添加*/
     protected val mInterceptors : MutableList<Interceptor> = mutableListOf()
@@ -50,6 +52,9 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
 
     /**网络响应的本地缓存*/
     protected var mResponseFileCache : Cache?= null
+
+    /**持久化cookies*/
+    protected var mCookieJar : CookieJar? = null
 
     /**
      * okhttp的默认配置类
@@ -78,9 +83,12 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
             throw NullPointerException("you must set baseUrl to HttpClientFactory")
         }
 
+        //设置Retrofit常用配置
         val impl = this.setBaseUrl(config.baseUrl?:"")
             .addConverterFactories(config.converterFactories)
             .addCallAdapterFactories(config.callAdapterFactories)
+
+        //配置OkHttpClient
         return if (config.okhttpClientBuilder != null){ //以okhttp build类配置优先
             impl.setOkHttpBuilder(config.okhttpClientBuilder)
         }else {
@@ -94,6 +102,8 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
                 .addNetworkInterceptors(config.networkInterceptors)
                 .setSSLSocketFactory(config.sslSocketConfig?.sslSocketFactory)
                 .setX509TrustManager(config.sslSocketConfig?.x509TrustManager)
+                .setCookieJar(config.cookieJar)
+                .setFollowRedirects(config.isFollowRedirects)
         }
     }
 
@@ -102,7 +112,7 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
      */
     protected open fun buildOkHttpClientInstance() : OkHttpClient{
         mOkHttpClientBuilder?.also {
-            return it.build()
+            return it.build() //存在配置类，直接使用外部完整配置
         }
 
         val builder = OkHttpClient.Builder()
@@ -137,9 +147,14 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
         //自动断线重连（默认为false）
         builder.retryOnConnectionFailure(isRetryOnConnectionFailure)
 
-        // </editor-fold>
+        //设置自动重定向
+        builder.followRedirects(isFollowRedirects)
+            .followSslRedirects(isFollowRedirects)
 
-        mOkHttpClientBuilder = builder
+        //设置持久化cookies
+        mCookieJar?.also { builder.cookieJar(it) }
+
+        // </editor-fold>
         return builder.build()
     }
 
@@ -286,11 +301,22 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
     }
 
     /**
-     * 设置是否断线重连
-     *  @return [BaseHttpClientFactoryImpl]类本身，便于链式调用
+     * 设置是否自动断线重连
+     * @param autoRetry
+     * @return [BaseHttpClientFactoryImpl]类本身，便于链式调用
      * */
     fun setRetryOnConnectionFailure(autoRetry : Boolean) : BaseHttpClientFactoryImpl {
         this.isRetryOnConnectionFailure = autoRetry
+        return this
+    }
+
+    /**
+     * 设置是否自动处理
+     * @param isRedirect 自动重定向
+     * @return [BaseHttpClientFactoryImpl]类本身，便于链式调用
+     * */
+    fun setFollowRedirects(isRedirect : Boolean) : BaseHttpClientFactoryImpl{
+        this.isFollowRedirects = isRedirect
         return this
     }
 
@@ -326,6 +352,17 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
     fun setResponseFileCache(cache: Cache?) : BaseHttpClientFactoryImpl {
         cache ?: return this
         this.mResponseFileCache = cache
+        return this
+    }
+
+    /**
+     * 设置持久化cookies辅助类
+     * @param cookieJar
+     * @return [BaseHttpClientFactoryImpl]类本身，便于链式调用
+     * */
+    fun setCookieJar(cookieJar: CookieJar?) : BaseHttpClientFactoryImpl{
+        cookieJar ?: return this
+        this.mCookieJar = cookieJar
         return this
     }
 
