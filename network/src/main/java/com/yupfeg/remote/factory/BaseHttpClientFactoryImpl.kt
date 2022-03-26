@@ -7,6 +7,7 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.NullPointerException
 import java.net.Proxy
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
@@ -57,6 +58,11 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
     protected var mCookieJar : CookieJar? = null
 
     /**
+     * 外部设置的调度器
+     * */
+    protected var mDispatcher : Dispatcher? = null
+
+    /**
      * okhttp的默认配置类
      * * 默认优先级最高，会直接使用这个builder进行配置，忽略所有其他快捷方式
      * */
@@ -92,6 +98,10 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
         return if (config.okhttpClientBuilder != null){ //以okhttp build类配置优先
             impl.setOkHttpBuilder(config.okhttpClientBuilder)
         }else {
+            config.executorService?.let {
+                impl.setDispatcher(it,config.maxRequestsPerHost,config.maxRequestSize)
+            }
+
             impl.setResponseFileCache(config.responseCache)
                 .setRetryOnConnectionFailure(config.isRetryOnConnectionFailure)
                 .setConnectTimeout(config.connectTimeout)
@@ -153,6 +163,9 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
 
         //设置持久化cookies
         mCookieJar?.also { builder.cookieJar(it) }
+
+        //请求调度器
+        mDispatcher?.also { builder.dispatcher(it) }
 
         // </editor-fold>
         return builder.build()
@@ -363,6 +376,26 @@ abstract class BaseHttpClientFactoryImpl : HttpClientFactory {
     fun setCookieJar(cookieJar: CookieJar?) : BaseHttpClientFactoryImpl{
         cookieJar ?: return this
         this.mCookieJar = cookieJar
+        return this
+    }
+
+    /**
+     * 设置网络请求任务调度器
+     * @param executorService
+     * @param maxRequestsPerHost 同一host的最大并发请求数
+     * @param maxRequestSize 最大并发请求数量，超出这个并发量，请求会进入等待队列
+     * @return [BaseHttpClientFactoryImpl]类本身，便于链式调用
+     * */
+    fun setDispatcher(
+        executorService: ExecutorService?,
+        maxRequestsPerHost : Int,
+        maxRequestSize : Int
+    ) : BaseHttpClientFactoryImpl{
+        executorService?:return this
+        this.mDispatcher = Dispatcher(executorService).apply {
+            this.maxRequests = maxRequestSize
+            this.maxRequestsPerHost = maxRequestsPerHost
+        }
         return this
     }
 

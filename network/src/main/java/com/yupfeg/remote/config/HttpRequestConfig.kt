@@ -4,6 +4,7 @@ import com.yupfeg.remote.interceptor.MultipleHostInterceptor
 import okhttp3.*
 import retrofit2.CallAdapter
 import retrofit2.Converter
+import java.util.concurrent.ExecutorService
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 
@@ -83,6 +84,21 @@ class HttpRequestConfig constructor(){
      * */
     @JvmField
     var cookieJar : CookieJar? = null
+
+    /**
+     * 最大并发请求数
+     * */
+    var maxRequestSize : Int = 64
+
+    /**
+     * 设置同一Host请求的最大并发数
+     * */
+    var maxRequestsPerHost : Int = 5
+
+    /**
+     * 外部设置调度器
+     * */
+    var executorService : ExecutorService? = null
 
     /**
      * okhttp配置，如果需要更多拓展配置需要可以直接传入build对象
