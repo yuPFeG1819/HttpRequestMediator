@@ -88,16 +88,19 @@ class HttpRequestConfig constructor(){
     /**
      * 最大并发请求数
      * */
+    @JvmField
     var maxRequestSize : Int = 64
 
     /**
      * 设置同一Host请求的最大并发数
      * */
+    @JvmField
     var maxRequestsPerHost : Int = 5
 
     /**
      * 外部设置调度器
      * */
+    @JvmField
     var executorService : ExecutorService? = null
 
     /**

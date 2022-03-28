@@ -45,7 +45,8 @@ dependencies {
     implementation ("androidx.appcompat:appcompat:${libVersion.appcompat}")
     implementation ("com.google.android.material:material:${libVersion.material}")
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
-    implementation ("com.gitee.yupfeg:logger:1.0.4")
+    implementation ("com.gitee.yupfeg:logger:1.2.2")
+    implementation("com.gitee.yupfeg:ExecutorProvider:1.0.2")
 
     implementation ("androidx.core:core-ktx:${libVersion.core}")
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"

@@ -4,7 +4,7 @@
 
 - ~~支持RxJava3，简化RxJava对于网络请求的统一处理~~（v1.0.5版本后已移除对于RxJava的依赖）
   
-- 提取对于网络请求的统一处理入口类，由外部注入具体处理策略
+- 提取对于网络请求的统一处理类，由外部注入具体处理策略
 
 - 可自定义配置的网络请求日志输出
 
@@ -38,6 +38,8 @@ dependencies {
 ```
 
 ## 更新日志
+- v1.0.8
+  1. 新增`OkHttpClient`线程调度器的快捷配置
 - v1.0.7
   1. 新增`OkHttpClient`对于`cookies`持久化以及自动重定向的快捷配置
 - v1.0.6
@@ -385,6 +387,29 @@ fun getUserData(...)
 > 以此类推...
 
 
+## 替换网络请求线程池
+
+在实际开发中，我们可能希望收敛项目中运行的线程池资源，避免维护多个线程池，导致线程数过多。
+而默认情况下，如果不配置时，会默认使用`OkHttpClient`内部自带的线程池（一个最大）进行网络请求调度。
+在外部可以通过`OkHttpClient`创建配置时，设置`setDispatcher`方法进行替换。
+
+在v1.0.8版本后，`HttpRequestConfig`类中提供了`executorService`属性，快捷设置线程池属性，
+只要设置了该属性，在内部创建`OkHttpClient`对象时，就调用`setDispatcher`方法设置网络请求执行的线程池。
+
+> 需要注意的是：
+> 
+> 在`OkHttpClient`实际发起请求的`RealCall`对象内，发起异步请求会创建`AsyncCall`对象，并执行调用内联函数`threadName`。
+> 
+> 将当前运行线程名称修改为`OkHttp ${request.url.redact()}`，然后在执行所有拦截器操作完成后修改回来。
+> 
+> 所以如果在日志中输出`Thread.currentThread.name`方法会出现不符合预期的情况，这是正常情况，实际线程还是由外部设置的线程来维护管理。
+> 
+> 上述逻辑，会发生在调用`call.enqueue`方法时，比如使用`suspend`修饰的网络请求api，默认就会调用`enqueue`发起异步请求。
+> 
+> 又比如`RxJava3CallAdapterFactory.create()`创建的`RxJava3CallAdapter`解析器，同样也会在内部调用`enqueue`发起异步请求。
+> 
+> 而`RxJava3CallAdapterFactory.createSynchronous()`则会在内部调用`execute`发起同步请求，而不会修改线程名称。
+ 
 
 ## 代码混淆配置
 
