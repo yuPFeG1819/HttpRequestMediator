@@ -87,8 +87,7 @@ object NetWorkStatusHelper {
 
     /**
      * 判断网络是否可用
-     *
-     * Must hold `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" `
+     * - Must hold `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" `
      * */
     @Suppress("unused")
     @RequiresPermission(ACCESS_NETWORK_STATE)
@@ -113,8 +112,7 @@ object NetWorkStatusHelper {
 
     /**
      * 判断Wifi连接是否可用
-     *
-     * Must hold `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" `
+     * - Must hold `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" `
      * */
     @RequiresPermission(ACCESS_NETWORK_STATE)
     @Suppress("unused")
@@ -138,8 +136,7 @@ object NetWorkStatusHelper {
 
     /**
      * 判断移动网络连接是否可用
-     *
-     * Must hold `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" `
+     * - Must hold `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" `
      * */
     @SuppressLint("ObsoleteSdkInt")
     @RequiresPermission(ACCESS_NETWORK_STATE)
@@ -234,7 +231,6 @@ object NetWorkStatusHelper {
                             mLogPrinter?.printDebugLog(
                                 NETWORK_LOG_TAG,"network status changed : wifi "
                             )
-                            mCurrStatus = NetWorkStatus.WIFI
                             dispatchNetworkStatusChange(NetWorkStatus.WIFI)
                         }
                         else ->{
@@ -249,7 +245,7 @@ object NetWorkStatusHelper {
         }
 
     /**
-     *
+     * 创建6.0以上的网络状态监听回调实例
      * */
     private fun createNetworkStatusCallBack() : ConnectivityManager.NetworkCallback
         = object : ConnectivityManager.NetworkCallback(){
@@ -283,22 +279,19 @@ object NetWorkStatusHelper {
                         mLogPrinter?.printDebugLog(
                             NETWORK_LOG_TAG,"network status onCapabilitiesChanged : wifi"
                         )
-                        mCurrStatus = NetWorkStatus.WIFI
-                        mNetworkStatusChangeListener?.onNetworkStatusChange(NetWorkStatus.WIFI)
+                        dispatchNetworkStatusChange(NetWorkStatus.WIFI)
                     }
                     networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
                         mLogPrinter?.printDebugLog(
                             NETWORK_LOG_TAG,"network status onCapabilitiesChanged : mobile"
                         )
-                        mCurrStatus = NetWorkStatus.MOBILE
-                        mNetworkStatusChangeListener?.onNetworkStatusChange(NetWorkStatus.MOBILE)
+                        dispatchNetworkStatusChange(NetWorkStatus.MOBILE)
                     }
                     else -> {
                         mLogPrinter?.printDebugLog(
                             NETWORK_LOG_TAG,"network status onCapabilitiesChanged : other"
                         )
-                        mCurrStatus = NetWorkStatus.OTHER
-                        mNetworkStatusChangeListener?.onNetworkStatusChange(NetWorkStatus.OTHER)
+                        dispatchNetworkStatusChange(NetWorkStatus.OTHER)
                     }
                 }
             }
@@ -308,6 +301,7 @@ object NetWorkStatusHelper {
      * 分发网络状态变化监听的回调
      * */
     private fun dispatchNetworkStatusChange(status : NetWorkStatus){
+        if (mCurrStatus == status) return
         mCurrStatus = status
         mNetworkStatusChangeListener?.onNetworkStatusChange(status)
     }
