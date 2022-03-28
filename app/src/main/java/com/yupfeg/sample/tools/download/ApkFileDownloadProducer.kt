@@ -1,17 +1,19 @@
 package com.yupfeg.sample.tools.download
 
 import com.jakewharton.rxrelay3.PublishRelay
+import com.yupfeg.executor.ExecutorProvider
 import com.yupfeg.remote.HttpRequestMediator
 import com.yupfeg.remote.config.HttpRequestConfig
 import com.yupfeg.remote.download.BaseFileDownloadProducer
 import com.yupfeg.remote.download.entity.DownloadProgressBean
 import com.yupfeg.remote.interceptor.DownloadProgressInterceptor
 import com.yupfeg.remote.log.HttpLogPrinter
-import com.yupfeg.sample.tools.pool.GlobalHttpThreadPoolExecutor
 import com.yupfeg.sample.data.remote.DownloadApiService
 import com.yupfeg.sample.tools.LoggerHttpLogPrinterImpl
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.*
+import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import okhttp3.Interceptor
@@ -77,6 +79,7 @@ class ApkFileDownloadProducer(
     fun downloadApk(
         fileUrl : String, saveFilePath : String
     ) : Maybe<Unit> {
+        //TODO 后续可使用flow替代
         return mDownloadApiService.downloadFileFromUrl(fileUrl)
             //step 下载文件响应，将byte字节数组保存到本地文件
             .map { responseBody->
@@ -91,7 +94,7 @@ class ApkFileDownloadProducer(
                 sendDownloadProgressChange(DownloadProgressBean.createDownloadFailure(fileUrl))
             }
             //上游执行在子线程，下游执行在主线程
-            .subscribeOn(Schedulers.from(GlobalHttpThreadPoolExecutor.executorService))
+            .subscribeOn(Schedulers.from(ExecutorProvider.ioExecutor))
             .observeOn(AndroidSchedulers.mainThread())
     }
 

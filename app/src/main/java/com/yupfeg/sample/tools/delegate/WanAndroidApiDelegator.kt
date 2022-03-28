@@ -1,6 +1,7 @@
 package com.yupfeg.sample.tools.delegate
 
 import com.google.gson.GsonBuilder
+import com.yupfeg.executor.ExecutorProvider
 import com.yupfeg.remote.HttpRequestMediator
 import com.yupfeg.remote.ext.addDslRemoteConfig
 import com.yupfeg.remote.tools.delegator.BaseRequestApiDelegator
@@ -31,6 +32,8 @@ class WanAndroidApiDelegator<T>(clazz: Class<T>)
             readTimeout = 10
             writeTimeout = 15
             isAllowProxy = true
+            //设置使用外部线程调度器
+            executorService = ExecutorProvider.ioExecutor
             networkInterceptors.add(HttpLogInterceptor(LoggerHttpLogPrinterImpl()))
             //添加gson解析支持
             converterFactories.add(GsonConverterFactory.create(GsonBuilder().setLenient().create()))

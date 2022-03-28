@@ -1,10 +1,10 @@
 package com.yupfeg.sample.tools.rxjava3
 
-import com.yupfeg.sample.tools.pool.GlobalHttpThreadPoolExecutor
+import com.yupfeg.executor.ExecutorProvider
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
-import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.reactivestreams.Publisher
 
@@ -19,7 +19,7 @@ import org.reactivestreams.Publisher
  * @param onNextErrorIntercept 在onNext前执行错误码拦截检测
  * @param doOnErrorConsumer 在onError前统一处理错误
  */
-@Suppress("unused")
+@Suppress("unused", "UPPER_BOUND_VIOLATED_BASED_ON_JAVA_ANNOTATIONS")
 class GlobalHttpTransformer<T>(
     /**在onNext前执行错误码拦截检测*/
     private val onNextErrorIntercept: Function<T, T>,
@@ -33,9 +33,7 @@ class GlobalHttpTransformer<T>(
     override fun apply(upstream: Maybe<T>): MaybeSource<T> {
         return upstream
             //step1: 订阅（事件源/http请求）发生在子线程
-            .subscribeOn(Schedulers.from(GlobalHttpThreadPoolExecutor.executorService))
-            //step2: 事件流下游发生在子线程
-            .observeOn(Schedulers.from(GlobalHttpThreadPoolExecutor.executorService))
+            .subscribeOn(Schedulers.from(ExecutorProvider.ioExecutor))
             //step3: 预处理API返回错误码
             .map { t ->
                 //类似：处理接口返回错误码，抛出对应异常
@@ -54,9 +52,7 @@ class GlobalHttpTransformer<T>(
     override fun apply(upstream: Observable<T>): ObservableSource<T> {
         return upstream
             //step1: 订阅（事件源/http请求）发生在子线程(也可交由OkHttp内部管理线程池异步执行)
-            .subscribeOn(Schedulers.from(GlobalHttpThreadPoolExecutor.executorService))
-            //step2: 事件流下游发生在子线程
-            .observeOn(Schedulers.from(GlobalHttpThreadPoolExecutor.executorService))
+            .subscribeOn(Schedulers.from(ExecutorProvider.ioExecutor))
             //step3: 预处理API返回错误码
             .map { t ->
                 //类似：处理接口返回错误码，抛出对应异常
@@ -76,9 +72,7 @@ class GlobalHttpTransformer<T>(
     override fun apply(upstream: Flowable<T>): Publisher<T> {
         return upstream
             //step1: 订阅（事件源/http请求）发生在子线程(也可交由OkHttp内部管理线程池异步执行)
-            .subscribeOn(Schedulers.from(GlobalHttpThreadPoolExecutor.executorService))
-            //step2: 事件流下游发生在子线程
-            .observeOn(Schedulers.from(GlobalHttpThreadPoolExecutor.executorService))
+            .subscribeOn(Schedulers.from(ExecutorProvider.ioExecutor))
             //step3: 预处理API返回错误码
             .map { t ->
                 //类似：处理接口返回错误码，抛出对应异常
