@@ -4,15 +4,25 @@ plugins {
     id "kotlin-parcelize"
     //kotlin替代注解
     id "kotlin-kapt"
-    // JitPack Maven
-    id "com.github.dcendents.android-maven"
+    id 'maven-publish'
 }
 
 def config = rootProject.ext.config
 def libVersion = rootProject.ext.dependencies
 
-//上传的jitpack仓库group
-group = "com.gitee.yupfeg"
+//设置maven Publish目标
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.gitee.yupfeg'
+                artifactId = 'http_request_mediator'
+                version = 'v1.0.9'
+            }
+        }
+    }
+}
 
 android {
     compileSdkVersion config.compileVersion
